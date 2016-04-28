@@ -51,6 +51,16 @@ var childLog = createLogger('bar') // namespace will be foo:bar
 ```
 
 
+### Enabling the logger
+
+The logger reads from a local storage property called `qubit_logger` to work out whether it should log to console. This value should be a comma-separated string of patterns to be matched against logger names, where `*` can be used for wildcard matching. Example values:
+
+- `*` - will log everything
+- `foo` - will log anything from the logger with the name `foo` precisely
+- `foo,bar` - will log anything from loggers named either `foo` or `bar`
+- `foo*` - will match any logger names starting with `foo` (e.g. `foobar` or `foobaz`)
+
+
 ### Best practices
 
 Create a main `logger.js` file in your module/app:
