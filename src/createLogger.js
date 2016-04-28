@@ -78,11 +78,10 @@ function consoleIsFancy () {
   return console.timeline && console.table
 }
 
-function createConsoleLogger () {
+function createConsoleLogger (color) {
   var allLevels = consoleSupportsAllLevels()
   var grouping = consoleSupportsGrouping()
   var isFancy = consoleIsFancy()
-  var color = randomReadableColor()
 
   return function log (name, level, message, metadata) {
     if (grouping && hasMetadata()) {
@@ -136,19 +135,19 @@ function compositeLogger (loggers) {
   }
 }
 
-function createLoggers (name, additionalLoggers) {
+function createLoggers (name, additionalLoggers, color) {
   var loggers = []
 
   if (shouldConsoleLog(name) && console) {
-    loggers.push(createConsoleLogger())
+    loggers.push(createConsoleLogger(color))
   }
 
   return loggers.concat(additionalLoggers)
 }
 
-function createLoggerAPI (name, logger, additionalLoggers) {
+function createLoggerAPI (name, logger, additionalLoggers, color) {
   function createSubLogger (subName) {
-    return createLogger(name + ':' + subName, additionalLoggers)
+    return createLogger(name + ':' + subName, additionalLoggers, color)
   }
 
   _.each(LEVELS, function (level) {
@@ -164,14 +163,17 @@ function createLoggerAPI (name, logger, additionalLoggers) {
   return createSubLogger
 }
 
-function createLogger (name, additionalLoggers) {
+function createLogger (name, additionalLoggers, color) {
   if (!name) {
     throw new Error('name required')
   }
 
-  var logger = compositeLogger(createLoggers(name, additionalLoggers))
+  if (!color) {
+    color = randomReadableColor()
+  }
 
-  return createLoggerAPI(name, logger, additionalLoggers)
+  var logger = compositeLogger(createLoggers(name, additionalLoggers, color))
+  return createLoggerAPI(name, logger, additionalLoggers, color)
 }
 
 createLogger.LEVELS = LEVELS

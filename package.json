@@ -25,6 +25,7 @@
     "karma-cli": "^0.1.2",
     "karma-junit-reporter": "^0.4.2",
     "karma-mocha": "^0.2.2",
+    "karma-sauce-launcher": "^0.3.1",
     "karma-spec-reporter": "0.0.26",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",

@@ -1,39 +1,65 @@
 module.exports = function (config) {
   process.env.NODE_ENV = 'test'
 
-  // verify we have saucelabs access details
-  if (!process.env.BROWSER_STACK_USERNAME || !process.env.BROWSER_STACK_ACCESS_KEY) {
-    console.error('BROWSER_STACK_USERNAME and BROWSER_STACK_ACCESS_KEY environment variables need to be set')
-    return process.exit(1)
+  // choose from: https://saucelabs.com/platforms/
+  var customLaunchers = {
+    sl_chrome: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'Windows 10'
+    },
+    sl_firefox: {
+      base: 'SauceLabs',
+      browserName: 'firefox'
+    },
+    sl_safari: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.11'
+    },
+    sl_ie: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer'
+    },
+    /**
+     * can't run due to browserify-zlib not supporting ie8
+    sl_ie_8: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 7',
+      version: '8'
+    },
+    **/
+    sl_ie_9: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 7',
+      version: '9'
+    }
   }
 
-  var customLaunchers = {
-    bs_chrome: {
-      base: 'BrowserStack',
-      browser: 'chrome',
-      os: 'OS X',
-      os_version: 'Yosemite'
-    },
-    bs_ie_8: {
-      base: 'BrowserStack',
-      browser: 'ie',
-      version: '8.0',
-      os: 'Windows',
-      os_version: 'XP'
+  // filter browsers for easy cli testing against sauce on particular platforms
+  if (process.env.BROWSERS) {
+    var browsers = process.env.BROWSERS.split(',')
+
+    customLaunchers = Object.keys(customLaunchers).reduce(function (filteredLaunchers, launcher) {
+      if (browsers.indexOf(launcher) >= 0) {
+        filteredLaunchers[launcher] = customLaunchers[launcher]
+      }
+      return filteredLaunchers
+    }, {})
+
+    if (Object.keys(customLaunchers).length === 0) {
+      console.error('You have excluded all launchers with browser filter [%s]', process.env.BROWSERS)
+      return process.exit(1)
     }
   }
 
   config.set({
-    browserStack: {
-      username: process.env.BROWSER_STACK_USERNAME,
-      accessKey: process.env.BROWSER_STACK_ACCESS_KEY,
-      project: 'visitor-engine-browser'
-    },
     basePath: '',
     frameworks: ['mocha', 'browserify'],
     browserify: {
-      debug: true,
-      transform: []
+      debug: true
     },
     files: [
       'src/**/*.js'
@@ -41,18 +67,14 @@ module.exports = function (config) {
     preprocessors: {
       'src/**/*.js': ['browserify']
     },
-    reporters: ['progress', 'junit', 'saucelabs'],
-    singleRun: true,
+    singleRun: false,
     colors: true,
-    port: 9876,
     logLevel: config.LOG_INFO,
-    browsers: Object.keys(customLaunchers),
+    sauceLabs: {
+      testName: 'logger'
+    },
     customLaunchers: customLaunchers,
-    junitReporter: {
-      outputDir: 'reports',
-      useBrowserName: true,
-      outputFile: undefined,
-      suite: ''
-    }
+    browsers: Object.keys(customLaunchers),
+    reporters: [ 'spec', 'saucelabs' ]
   })
 }

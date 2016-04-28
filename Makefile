@@ -16,6 +16,5 @@ test-watch:
 lint:
 	@$(BIN)/standard
 
-bootstrap: package.json
-	@npm install qubitdigital/deliver-cli
-	$(BIN)/deliver install
+bootstrap:
+	@npm install

@@ -1,4 +1,7 @@
-# logger
+# logger [ ![Codeship Status for qubitdigital/logger](https://codeship.com/projects/1504d8b0-d965-0133-7924-56bde683aa9e/status?branch=master)](https://codeship.com/projects/143490)
+
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/oliverwoodings_qubit.svg)](https://saucelabs.com/u/oliverwoodings_qubit)
+
 
 A namespaced stylish client-side logger. Most of the code was taken from D Piddy's `visitor-engine-utils` logger.
 
