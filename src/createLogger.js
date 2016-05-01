@@ -140,7 +140,7 @@ function createLoggers (name, additionalLoggers) {
   var loggers = []
 
   if (shouldConsoleLog(name) && console) {
-    loggers.push(createConsoleLogger(color))
+    loggers.push(createConsoleLogger())
   }
 
   return loggers.concat(additionalLoggers)
