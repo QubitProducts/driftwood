@@ -7,7 +7,7 @@ TESTS = $(shell find ./src -type f -name '*-test.js')
 test: lint
 	@NODE_ENV=test $(BIN)/karma start --single-run
 
-test-ci:
+test-ci: lint
 	@NODE_ENV=test $(BIN)/karma start karma.conf-ci.js --single-run
 
 test-watch:
