@@ -1,6 +1,5 @@
 # logger [ ![Codeship Status for qubitdigital/logger](https://codeship.com/projects/1504d8b0-d965-0133-7924-56bde683aa9e/status?branch=master)](https://codeship.com/projects/143490)
 
-
 A namespaced stylish logger primarily for the browser. Most of the code was taken from D Piddy's `visitor-engine-utils` logger.
 
 
@@ -78,6 +77,8 @@ By default the logger will not output anything. You need to enable it first, as 
 - `{ 'foo': 'trace' }` - will log anything from the logger with the name `foo` at the `trace` level
 - `{ 'foo': 'trace', 'bar*': 'warn' }` - will log `foo` at `trace` and `bar*` at `warn`
 - `{ 'foo*': 'error', '*': 'info' }` - will only log up to error from `foo*` and up to info from everything else
+
+When running in the browser, the log configuration is persisted into `localStorage`. When running in node, it is kept in memory. Therefore if you want log output in node you need to enable it _before_ creating your log instance.
 
 
 ### Best practices
