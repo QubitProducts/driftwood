@@ -21,20 +21,23 @@ module.exports = function (config) {
       base: 'SauceLabs',
       browserName: 'internet explorer'
     },
-    /**
-     * can't run due to browserify-zlib not supporting ie8
     sl_ie_8: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '8'
     },
-    **/
     sl_ie_9: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
       version: '9'
+    },
+    sl_ie_10: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 7',
+      version: '10'
     }
   }
 
