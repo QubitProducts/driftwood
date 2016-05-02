@@ -1,9 +1,7 @@
 # logger [ ![Codeship Status for qubitdigital/logger](https://codeship.com/projects/1504d8b0-d965-0133-7924-56bde683aa9e/status?branch=master)](https://codeship.com/projects/143490)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/oliverwoodings_qubit.svg)](https://saucelabs.com/u/oliverwoodings_qubit)
 
-
-A namespaced stylish client-side logger. Most of the code was taken from D Piddy's `visitor-engine-utils` logger.
+A namespaced stylish logger primarily for the browser. Most of the code was taken from D Piddy's `visitor-engine-utils` logger.
 
 
 ### Example
@@ -21,6 +19,16 @@ var subModuleLog = log('a-sub-module')
 subModuleLog.info('You can create loggers off loggers')
 subModuleLog.warn('So that your logs remain under the same top namespace')
 subModuleLog.error('Isn\t this cool?')
+```
+
+Enabling log output:
+
+```js
+createLogger.enable() // defaults to { '*': 'info' }
+window.__qubit.logger.enable({ // it is also available on the window
+  'foo': 'info',
+  'bar:*': 'debug'
+})
 ```
 
 
@@ -53,15 +61,23 @@ var parentLog = createLogger('foo') // namespace will be foo
 var childLog = createLogger('bar') // namespace will be foo:bar
 ```
 
+### `createLogger.enable(config)`
 
-### Enabling the logger
+Enable logging using the optional log level config. The config is a map of name patterns to log level, defaulting to `{ '*': 'info' }`. See below for more pattern examples. This method is also available on the window at `window.__qubit.logger.enable()`.
 
-The logger reads from a local storage property called `qubit_logger` to work out whether it should log to console. This value should be a comma-separated string of patterns to be matched against logger names, where `*` can be used for wildcard matching. Example values:
+### `createLogger.disable()`
 
-- `*` - will log everything
-- `foo` - will log anything from the logger with the name `foo` precisely
-- `foo,bar` - will log anything from loggers named either `foo` or `bar`
-- `foo*` - will match any logger names starting with `foo` (e.g. `foobar` or `foobaz`)
+Clears the log config, disabling logging. Also available at `window.__qubit.logger.disable()`.
+
+
+### Enabling logging
+
+By default the logger will not output anything. You need to enable it first, as specified above. Below are some examples of log configs you can pass (you can use `*` as a wildcard:
+
+- `{ '*': null }` - will log everything at the default level (`info`)
+- `{ 'foo': 'trace' }` - will log anything from the logger with the name `foo` at the `trace` level
+- `{ 'foo': 'trace', 'bar*': 'warn' }` - will log `foo` at `trace` and `bar*` at `warn`
+- `{ 'foo*': 'error', '*': 'info' }` - will only log up to error from `foo*` and up to info from everything else
 
 
 ### Best practices
@@ -88,4 +104,11 @@ In each of your submodules, create a sub logger:
 // subModuleA.js
 var log = require('./logger')('sub-module-a')
 log.debug('We are in a submodule of the app!')
+```
+
+When running in node and you want log out, enable logging _before_ creating your loggers:
+
+```js
+createLogger.enable()
+var log = createLogger('my-app')
 ```
