@@ -1,31 +1,28 @@
 var patterns = require('../patterns')
 var expect = require('../../test/expect')
-
-var STORAGE_NAMESPACE = 'qubit_logger'
+var storage = require('../storage')
 
 describe('patterns', function () {
-  afterEach(function () {
-    window.localStorage.removeItem(STORAGE_NAMESPACE)
-  })
+  afterEach(storage.reset)
 
   describe('get', function () {
-    it('should parse the value from localstorage', function () {
-      window.localStorage.setItem(STORAGE_NAMESPACE, '{ "foo": "bar" }')
+    it('should parse the value from storage', function () {
+      storage.set('{"foo": "bar"}')
       expect(patterns.get()).to.eql({ foo: 'bar' })
     })
 
     describe('if there is bad JSON', function () {
       it('should return an empty object', function () {
-        window.localStorage.setItem(STORAGE_NAMESPACE, 'oinf@oin')
+        storage.set('oinf@oin')
         expect(patterns.get()).to.eql({})
       })
     })
   })
 
   describe('set', function () {
-    it('should stringify the value into localstorage', function () {
+    it('should stringify the value into storage', function () {
       patterns.set({ foo: 'bar' })
-      expect(window.localStorage.getItem(STORAGE_NAMESPACE)).to.equal('{"foo":"bar"}')
+      expect(storage.get()).to.equal('{"foo":"bar"}')
     })
 
     describe('if there is an error', function () {

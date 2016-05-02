@@ -1,5 +1,6 @@
 var _ = require('slapdash')
 var LEVELS = require('./levels')
+var isBrowser = require('./isBrowser')
 
 var levelColors = {
   trace: '#6C7A89',
@@ -7,6 +8,14 @@ var levelColors = {
   info: '#446CB3',
   warn: '#E87E04',
   error: '#F22613'
+}
+var console = getConsole()
+
+function getConsole () {
+  if (isBrowser()) {
+    return window.console
+  }
+  return global.console
 }
 
 /**
@@ -38,6 +47,10 @@ function consoleIsFancy () {
 }
 
 function createConsoleLogger () {
+  if (!console) {
+    return null
+  }
+
   var allLevels = consoleSupportsAllLevels()
   var grouping = consoleSupportsGrouping()
   var isFancy = consoleIsFancy()
@@ -88,3 +101,10 @@ function createConsoleLogger () {
 }
 
 module.exports = createConsoleLogger
+
+module.exports._setConsole = function set (newConsole) {
+  console = newConsole
+}
+module.exports._resetConsole = function reset () {
+  console = getConsole()
+}

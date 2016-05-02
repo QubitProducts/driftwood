@@ -1,11 +1,11 @@
-var originalConsole = console
+var createConsoleLogger = require('../src/createConsoleLogger')
 
 function set (newConsole) {
-  window.console = newConsole
+  createConsoleLogger._setConsole(newConsole)
 }
 
 function reset () {
-  window.console = originalConsole
+  createConsoleLogger._resetConsole()
 }
 
 module.exports = {

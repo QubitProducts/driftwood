@@ -1,11 +1,11 @@
 var _ = require('slapdash')
+var storage = require('./storage')
 
 var DEFAULT_LEVEL = 'info'
-var STORAGE_NAMESPACE = 'qubit_logger'
 
 function get () {
   try {
-    var payload = window.localStorage.getItem(STORAGE_NAMESPACE) || ''
+    var payload = storage.get()
     return JSON.parse(payload) || {}
   } catch (e) {
     return {}
@@ -15,7 +15,7 @@ function get () {
 function set (patterns) {
   try {
     var payload = JSON.stringify(patterns)
-    window.localStorage.setItem(STORAGE_NAMESPACE, payload)
+    storage.set(payload)
   } catch (e) { }
 }
 

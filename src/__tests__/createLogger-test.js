@@ -4,6 +4,7 @@ var _ = require('slapdash')
 var createLogger = require('../createLogger')
 var LEVELS = require('../levels')
 var consoleUtils = require('../../test/consoleUtils')
+var isBrowser = require('../isBrowser')
 
 describe('createLogger', function () {
   var consoleStub
@@ -11,6 +12,19 @@ describe('createLogger', function () {
 
   afterEach(createLogger.disable)
   afterEach(consoleUtils.reset)
+
+  if (isBrowser()) {
+    it('should expose the enable/disable api on the window in the browser', function () {
+      expect(window.__qubit).to.be.an('object')
+      expect(window.__qubit.logger).to.be.an('object')
+      expect(window.__qubit.logger.enable).to.equal(createLogger.enable)
+      expect(window.__qubit.logger.disable).to.equal(createLogger.disable)
+    })
+  } else {
+    it('should not try and expose the enable/disable api in node', function () {
+      expect(typeof window).to.equal('undefined')
+    })
+  }
 
   describe('with no name', function () {
     it('throws exception', function () {
