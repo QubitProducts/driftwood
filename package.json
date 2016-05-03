@@ -1,6 +1,6 @@
 {
   "name": "@qubit/logger",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A namespaced stylish client-side logger",
   "main": "index.js",
   "scripts": {
