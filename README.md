@@ -1,12 +1,12 @@
 # logger [ ![Codeship Status for qubitdigital/logger](https://codeship.com/projects/1504d8b0-d965-0133-7924-56bde683aa9e/status?branch=master)](https://codeship.com/projects/143490)
 
-A namespaced stylish logger primarily for the browser. Most of the code was taken from D Piddy's `visitor-engine-utils` logger.
+A namespaced stylish logger primarily for the browser.
 
 
 ### Example
 
 ```js
-var createLogger = require('@qubit/logger')
+var createLogger = require('driftwood')
 
 var log = createLogger('mymodule-main')
 
@@ -87,7 +87,7 @@ Create a main `logger.js` file in your module/app:
 
 ```js
 // logger.js
-var createLogger = require('@qubit/logger')
+var createLogger = require('driftwood')
 module.exports = createLogger('my-app')
 ```
 
@@ -113,3 +113,12 @@ When running in node and you want log out, enable logging _before_ creating your
 createLogger.enable()
 var log = createLogger('my-app')
 ```
+
+
+### Want to work on this for your day job?
+
+This project was created by the Engineering team at [Qubit](http://www.qubit.com). As we use open source libraries, we make our projects public where possible.
+
+We’re currently looking to grow our team, so if you’re a JavaScript engineer and keen on ES2016 React+Redux applications and Node micro services, why not get in touch? Work with like minded engineers in an environment that has fantastic perks, including an annual ski trip, yoga, a competitive foosball league, and copious amounts of yogurt.
+
+Find more details on our [Engineering site](https://eng.qubit.com). Don’t have an up to date CV? Just link us your Github profile! Better yet, send us a pull request that improves this project.

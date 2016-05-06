@@ -1,21 +1,21 @@
 {
-  "name": "@qubit/logger",
+  "name": "driftwood",
   "version": "1.1.0",
-  "description": "A namespaced stylish client-side logger",
+  "description": "A namespaced stylish logger primarily for the browser",
   "main": "index.js",
   "scripts": {
     "test": "make test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qubitdigital/logger.git"
+    "url": "git+https://github.com/QubitProducts/driftwood.git"
   },
   "author": "Qubit",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/qubitdigital/logger/issues"
+    "url": "https://github.com/QubitProducts/driftwood/issues"
   },
-  "homepage": "https://github.com/qubitdigital/logger#readme",
+  "homepage": "https://github.com/QubitProducts/driftwood#readme",
   "devDependencies": {
     "browserify": "^13.0.0",
     "expect.js": "^0.3.1",
