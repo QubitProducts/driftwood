@@ -43,7 +43,7 @@ function consoleSupportsGrouping () {
  * Practically is there a good chance it supports CSS?
  **/
 function consoleIsFancy () {
-  return console.timeline && console.table
+  return console.timeline && console.table && !window.__karma__
 }
 
 function createConsoleLogger () {
