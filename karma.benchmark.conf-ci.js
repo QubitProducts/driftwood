@@ -77,6 +77,7 @@ module.exports = function (config) {
     sauceLabs: {
       testName: 'driftwood'
     },
+    browserNoActivityTimeout: 60000,
     customLaunchers: customLaunchers,
     browsers: Object.keys(customLaunchers),
     reporters: ['benchmark', 'saucelabs']
