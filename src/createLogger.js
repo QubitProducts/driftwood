@@ -4,15 +4,15 @@ var patterns = require('./patterns')
 var LEVELS = require('./levels')
 var isBrowser = require('./isBrowser')
 
-function compositeLogger (name, loggers) {
-  var minLevelIndex = _.indexOf(LEVELS, patterns.getLevel(name))
+function noop () { }
 
+function compositeLogger (name, loggers) {
   return function (name, level, message, metadata) {
-    if (_.indexOf(LEVELS, level) >= minLevelIndex) {
-      _.each(loggers, function (logger) {
+    _.each(loggers, function (logger) {
+      try {
         logger(name, level, message, metadata)
-      })
-    }
+      } catch (e) { }
+    })
   }
 }
 
@@ -20,7 +20,7 @@ function createLoggers (name, additionalLoggers) {
   var loggers = []
 
   var consoleLogger = createConsoleLogger()
-  if (consoleLogger && patterns.match(name)) {
+  if (consoleLogger) {
     loggers.push(consoleLogger)
   }
 
@@ -32,13 +32,16 @@ function createLoggerAPI (name, logger, additionalLoggers) {
     return createLogger(name + ':' + subName, additionalLoggers)
   }
 
-  _.each(LEVELS, function (level) {
-    createSubLogger[level] = function (message, metadata) {
-      try {
+  var isEnabled = patterns.match(name)
+  var minLevelIndex = _.indexOf(LEVELS, patterns.getLevel(name))
+
+  _.each(LEVELS, function (level, levelIndex) {
+    if (isEnabled && levelIndex >= minLevelIndex) {
+      createSubLogger[level] = function (message, metadata) {
         logger(name, level, message, metadata)
-      } catch (err) {
-        // intentionally throw away
       }
+    } else {
+      createSubLogger[level] = noop
     }
   })
 

@@ -24,7 +24,7 @@ test-browser:
 
 test-ci: test-node
 	@NODE_ENV=test $(BIN)/karma start karma.conf-ci.js --single-run
-	@make benchmark
+	@make benchmark-ci
 
 test-browser-watch:
 	@NODE_ENV=test $(BIN)/karma start
