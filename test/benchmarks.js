@@ -1,3 +1,5 @@
+/* global createLogger, consoleUtils */
+
 suite('creating the logger', function () {
   benchmark('basic', function () {
     createLogger('foo')
