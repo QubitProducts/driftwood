@@ -60,15 +60,16 @@ module.exports = function (config) {
 
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'browserify'],
+    frameworks: ['benchmark', 'browserify'],
     browserify: {
       debug: true
     },
     files: [
-      'src/**/*.js'
+      'test/windowExpose.js',
+      'test/benchmarks.js'
     ],
     preprocessors: {
-      'src/**/*.js': ['browserify']
+      'test/windowExpose.js': ['browserify']
     },
     singleRun: false,
     colors: true,
@@ -78,6 +79,6 @@ module.exports = function (config) {
     },
     customLaunchers: customLaunchers,
     browsers: Object.keys(customLaunchers),
-    reporters: ['spec', 'saucelabs']
+    reporters: ['benchmark', 'saucelabs']
   })
 }

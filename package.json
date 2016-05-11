@@ -17,15 +17,20 @@
   },
   "homepage": "https://github.com/QubitProducts/driftwood#readme",
   "devDependencies": {
+    "benchmark": "^2.1.0",
     "browserify": "^13.0.0",
     "expect.js": "^0.3.1",
+    "grunt": "^0.4.5",
     "karma": "^0.13.22",
+    "karma-benchmark": "^0.4.0",
+    "karma-benchmark-reporter": "^0.1.1",
     "karma-browserify": "^5.0.4",
     "karma-chrome-launcher": "^0.2.3",
     "karma-cli": "^0.1.2",
     "karma-mocha": "^0.2.2",
     "karma-sauce-launcher": "^0.3.1",
     "karma-spec-reporter": "0.0.26",
+    "lodash": "^4.12.0",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",
     "sinon-expect": "^0.3.0",
@@ -37,7 +42,9 @@
       "describe",
       "it",
       "beforeEach",
-      "afterEach"
+      "afterEach",
+      "suite",
+      "benchmark"
     ]
   },
   "dependencies": {
