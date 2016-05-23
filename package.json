@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/QubitProducts/driftwood#readme",
   "devDependencies": {
+    "moment" : "2.13.0",
     "benchmark": "^2.1.0",
     "browserify": "^13.0.0",
     "expect.js": "^0.3.1",
