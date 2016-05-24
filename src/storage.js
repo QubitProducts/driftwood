@@ -1,14 +1,22 @@
 var STORAGE_NAMESPACE = 'qubit_logger'
+var TEST_KEY = '__dwTest__'
 
 var memoryStorage = ''
+var localStorage = typeof window !== 'undefined' && window.localStorage
 
 function hasLocalStorage () {
-  return typeof window !== 'undefined' && window.localStorage
+  try {
+    localStorage.setItem(TEST_KEY, 1)
+    localStorage.removeItem(TEST_KEY)
+    return true
+  } catch (e) {
+    return false
+  }
 }
 
 function set (value) {
   if (hasLocalStorage()) {
-    window.localStorage.setItem(STORAGE_NAMESPACE, value)
+    localStorage.setItem(STORAGE_NAMESPACE, value)
   } else {
     memoryStorage = value
   }
@@ -16,7 +24,7 @@ function set (value) {
 
 function get () {
   if (hasLocalStorage()) {
-    return window.localStorage.getItem(STORAGE_NAMESPACE) || ''
+    return localStorage.getItem(STORAGE_NAMESPACE) || ''
   } else {
     return memoryStorage
   }
@@ -24,7 +32,7 @@ function get () {
 
 function reset () {
   if (hasLocalStorage()) {
-    window.localStorage.removeItem(STORAGE_NAMESPACE)
+    localStorage.removeItem(STORAGE_NAMESPACE)
   } else {
     memoryStorage = ''
   }
