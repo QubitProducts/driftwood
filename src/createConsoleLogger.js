@@ -1,5 +1,4 @@
 var _ = require('slapdash')
-var moment = require('moment')
 var LEVELS = require('./levels')
 var isBrowser = require('./isBrowser')
 
@@ -86,8 +85,7 @@ function createConsoleLogger () {
     }
 
     function formatMessage () {
-      // [TIMESTAMP] [NAME] LEVEL: MESSAGE
-      return '[' + moment().format('YYYY-MM-DD HH:mm:ss') + ']' + '[' + name + ']' + level.toUpperCase() + ':' + message
+      return level.toUpperCase() + ' [' + name + ']: ' + message
     }
 
     function formatFancyMessage () {
