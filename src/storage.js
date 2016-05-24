@@ -1,9 +1,8 @@
-var _ = require('slapdash')
 var STORAGE_NAMESPACE = 'qubit_logger'
 var TEST_KEY = '__dwTest__'
 
 var memoryStorage = ''
-var localStorage = _.get(window, 'localStorage')
+var localStorage = typeof window !== 'undefined' && window.localStorage
 
 function hasLocalStorage () {
   try {
