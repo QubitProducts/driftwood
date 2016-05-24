@@ -8,9 +8,10 @@ function noop () { }
 
 function compositeLogger (name, loggers) {
   return function (name, level, message, metadata) {
+    var date_now = new Date()
     _.each(loggers, function (logger) {
       try {
-        logger(name, level, message, metadata)
+        logger(name, level, message, metadata, date_now, "")
       } catch (e) { }
     })
   }
