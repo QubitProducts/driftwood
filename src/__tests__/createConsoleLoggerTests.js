@@ -42,7 +42,7 @@ describe('createConsoleLogger', function () {
         return console
       }, {})
 
-      _.extend(consoleStub, {
+      _.assign(consoleStub, {
         groupCollapsed: sinon.stub(),
         groupEnd: sinon.stub(),
         log: sinon.stub()
