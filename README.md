@@ -17,7 +17,7 @@ var subModuleLog = log('a-sub-module')
 
 subModuleLog.info('You can create loggers off loggers')
 subModuleLog.warn('So that your logs remain under the same top namespace')
-subModuleLog.error('Isn\t this cool?')
+subModuleLog.error('Isn\'t this cool?')
 ```
 
 Enabling log output:
