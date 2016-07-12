@@ -48,6 +48,7 @@
     ]
   },
   "dependencies": {
+    "json-bourne": "^1.0.1",
     "slapdash": "^1.2.0"
   }
 }

@@ -1,4 +1,5 @@
 var _ = require('slapdash')
+var JSON = require('json-bourne')
 var storage = require('./storage')
 
 var DEFAULT_LEVEL = 'info'
