@@ -6,7 +6,7 @@ var DEFAULT_LEVEL = 'info'
 function get () {
   try {
     var payload = storage.get()
-    return JSON.parse(payload) || {}
+    return payload && JSON.parse(payload) || {}
   } catch (e) {
     return {}
   }
