@@ -56,7 +56,33 @@ function createConsoleLogger () {
   var isFancy = consoleIsFancy()
   var color = randomReadableColor()
 
-  return function log (name, level, message, metadata) {
+  return function log (name, level, message, metadata, date, formatting) {
+    //  This is what'll get called everytime we want to send a message.
+    //
+    //  name(str)      : The name of the logger
+    //  level(str)     : one of 'trace', 'debug', 'info', 'warn', 'error'
+    //  message(str)   : What message do we want to log
+    //  metadata(obj)  : Any metadata we'd also like to output
+    //
+    //  {
+    //    "some_val" : x,
+    //    "foo"      : "bar"
+    //  }
+    //
+    //  date(date)     : the current date
+    //  formatting(str): a formatting string, of the form:
+    //  "KEY1 KEY2 KEY3"
+    //
+    //  Where key can be any from the formattingMapping object.
+    
+    // These are the valid mappings for formatting the output.
+    formattingMapping = {
+      "NAME"    : name,
+      "LEVEL"   : level.toUpperCase(),
+      "MESSAGE" : message,
+      "DATE"    : date
+    }
+
     if (grouping && hasMetadata()) {
       if (isFancy) {
         console.groupCollapsed.apply(console, formatFancyMessage())
@@ -84,8 +110,33 @@ function createConsoleLogger () {
       return metadata && _.keys(metadata).length > 0
     }
 
+    function getFormatting () {
+      // Here we're gonna check if we've got a formatting string
+      // If we havent, we'll use the default
+      if (formatting) {
+        return formatting
+      } else {
+	// If this logger didnt get a formatting string, use this default.
+	// some_date - [MYLOGGER_INFO]: SOME_MESSAGE
+        return "DATE - [NAME] LEVEL : MESSAGE"
+      }
+    }
+
     function formatMessage () {
-      return level.toUpperCase() + ' [' + name + ']: ' + message
+      // Lets loop over all the items in the formattingMapping object,
+      // and put them into the output
+      // http://stackoverflow.com/a/921808
+      
+      msg = getFormatting()
+      for (var key in formattingMapping) {
+        // Skip loop if the property is from prototype
+	if (!formattingMapping.hasOwnProperty(key)) continue;
+
+        var obj = formattingMapping[key];
+	msg = msg.replace(key, obj)
+      }
+     console.log(msg)
+     return msg
     }
 
     function formatFancyMessage () {
