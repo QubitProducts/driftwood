@@ -66,7 +66,7 @@ module.exports = function (config) {
     },
     files: [
       'test/windowExpose.js',
-      'test/benchmarks.js'
+      'test/suites/benchmarks.js'
     ],
     preprocessors: {
       'test/windowExpose.js': ['browserify']

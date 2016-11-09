@@ -1,6 +1,8 @@
 # logger [ ![Codeship Status for qubitdigital/logger](https://codeship.com/projects/1504d8b0-d965-0133-7924-56bde683aa9e/status?branch=master)](https://codeship.com/projects/143490)
 
-A namespaced stylish logger primarily for the browser.
+A namespaced stylish logger for the browser and node.
+
+![](https://cloud.githubusercontent.com/assets/621323/18617528/83dc16fa-7dc9-11e6-825f-dfbb4d2fa891.png)
 
 
 ### Example
@@ -41,15 +43,17 @@ Create a new named log instance, optionally supplying additional loggers (e.g. s
 function (name, level, message, metadata) { ... }
 ```
 
-### `log.{LEVEL}(message, metadata)`
+### `log.{LEVEL}(message, [message], [metadata/Error])`
 
-Log a message at a level, optionally with a metadata object. Available levels:
+Log a message at a level, optionally with a metadata object or error instance. Available levels:
 
 - `trace`
 - `debug`
 - `info`
 - `warn`
 - `error`
+
+The last argument of the log call can be an object or an instance of `Error`, which Driftwood will attempt to present in a more readable fashion. All preceding arguments will be concatenated together into a string. 
 
 ### `log(name)`
 
@@ -78,7 +82,13 @@ By default the logger will not output anything. You need to enable it first, as 
 - `{ 'foo': 'trace', 'bar*': 'warn' }` - will log `foo` at `trace` and `bar*` at `warn`
 - `{ 'foo*': 'error', '*': 'info' }` - will only log up to error from `foo*` and up to info from everything else
 
-When running in the browser, the log configuration is persisted into `localStorage`. When running in node, it is kept in memory. Therefore if you want log output in node you need to enable it _before_ creating your log instance.
+When running in the browser, you can pass a `persist` flag to persist the log configuration into `localStorage`:
+
+```js
+createLogger.enable({ '*': 'info' }, { persist: true })
+```
+
+When running in node, it is kept in memory. Therefore if you want log output in node you need to enable it _before_ creating your log instance.
 
 
 ### Best practices

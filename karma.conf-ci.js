@@ -1,3 +1,5 @@
+var webpack = require('./webpack.config.test')
+
 module.exports = function (config) {
   process.env.NODE_ENV = 'test'
 
@@ -60,15 +62,18 @@ module.exports = function (config) {
 
   config.set({
     basePath: '',
-    frameworks: ['mocha', 'browserify'],
-    browserify: {
-      debug: true
-    },
+    frameworks: ['mocha'],
     files: [
-      'src/**/*.js'
+      'test/common/**/*.js',
+      'test/browser/**/*.js'
     ],
     preprocessors: {
-      'src/**/*.js': ['browserify']
+      'test/common/**/*.js': ['webpack', 'sourcemap'],
+      'test/browser/**/*.js': ['webpack', 'sourcemap']
+    },
+    webpack: webpack,
+    webpackMiddleware: {
+      stats: 'errors-only'
     },
     singleRun: false,
     colors: true,

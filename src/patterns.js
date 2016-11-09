@@ -13,10 +13,10 @@ function get () {
   }
 }
 
-function set (patterns) {
+function set (patterns, opts) {
   try {
     var payload = JSON.stringify(patterns)
-    storage.set(payload)
+    storage.set(payload, opts)
   } catch (e) { }
 }
 

@@ -1,6 +1,6 @@
-var patterns = require('../patterns')
-var expect = require('../../test/expect')
-var storage = require('../storage')
+var patterns = require('../../src/patterns')
+var expect = require('../expect')
+var storage = require('../../src/storage')
 
 describe('patterns', function () {
   afterEach(storage.reset)

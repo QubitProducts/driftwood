@@ -7,33 +7,31 @@ TESTS = $(shell find ./src -type f -name '*-test.js')
 test: lint test-node test-browser
 
 benchmark:
-	@NODE_ENV=test $(BIN)/karma start karma.benchmark.conf.js --single-run\
+	NODE_ENV=test $(BIN)/karma start karma.benchmark.conf.js --single-run\
 
 benchmark-ci:
-	@NODE_ENV=test $(BIN)/karma start karma.benchmark.conf-ci.js --single-run
+	NODE_ENV=test $(BIN)/karma start karma.benchmark.conf-ci.js --single-run
 
 benchmark-watch:
-	@NODE_ENV=test $(BIN)/karma start karma.benchmark.conf.js
+	NODE_ENV=test $(BIN)/karma start karma.benchmark.conf.js
 
 test-node:
-	@NODE_ENV=test $(BIN)/mocha "src/**/*Tests.js"
+	NODE_ENV=test $(BIN)/mocha "test/node/**/*Tests.js" "test/common/**/*Tests.js"
 
 test-browser:
-	@NODE_ENV=test $(BIN)/karma start --single-run
-	@make benchmark
+	NODE_ENV=test $(BIN)/karma start --single-run
 
-test-ci: test-node
-	@NODE_ENV=test $(BIN)/karma start karma.conf-ci.js --single-run
-	@make benchmark-ci
+test-ci: lint test-node
+	NODE_ENV=test $(BIN)/karma start karma.conf-ci.js --single-run
 
 test-browser-watch:
-	@NODE_ENV=test $(BIN)/karma start
+	NODE_ENV=test $(BIN)/karma start
 
 test-node-watch:
-	@NODE_ENV=test $(BIN)/mocha -w "src/**/*-test.js"
+	NODE_ENV=test $(BIN)/mocha -w "test/node/**/*Tests.js" "test/common/**/*Tests.js"
 
 lint:
-	@$(BIN)/standard
+	$(BIN)/standard5
 
 bootstrap:
-	@npm install
+	npm install
