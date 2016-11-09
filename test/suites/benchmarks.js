@@ -1,4 +1,5 @@
-/* global createLogger, consoleUtils */
+/* global createLogger, consoleUtils, log */
+var restore
 
 suite('creating the logger', function () {
   benchmark('basic', function () {
@@ -35,12 +36,12 @@ suite('logging when enabled', function () {
   })
 }, {
   setup: function () {
+    restore = consoleUtils.noop(log)
     createLogger.enable({ '*': 'trace' })
-    consoleUtils.noop()
     this.logger = createLogger('foo')
   },
   teardown: function () {
     createLogger.disable()
-    consoleUtils.reset()
+    restore()
   }
 })

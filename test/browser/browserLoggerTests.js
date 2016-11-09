@@ -1,32 +1,33 @@
-var expect = require('../../test/expect')
+var expect = require('../expect')
 var sinon = require('sinon')
 var _ = require('slapdash')
-var consoleUtils = require('../../test/consoleUtils')
-var createConsoleLogger = require('../createConsoleLogger')
-var LEVELS = require('../levels')
+var LEVELS = require('../../src/levels')
+var browserLogger = require('../../src/logger/browser')
 
-describe('createConsoleLogger', function () {
-  var logger
-  var consoleStub
+describe('browserLogger', function () {
+  var consoleStub, log, reset
 
-  afterEach(consoleUtils.reset)
-
-  it('should return a function', function () {
-    expect(createConsoleLogger()).to.be.a('function')
+  afterEach(function () {
+    if (reset) {
+      reset()
+      reset = null
+    }
   })
+
+  function stubConsole (stub) {
+    consoleStub = stub
+    reset = browserLogger.__stubConsole__(consoleStub)
+    log = browserLogger()
+  }
 
   describe('when console only supports console.log', function () {
     beforeEach(function () {
-      consoleStub = {
-        log: sinon.stub()
-      }
-      consoleUtils.set(consoleStub)
-      logger = createConsoleLogger()
+      stubConsole({ log: sinon.stub() })
     })
 
     describe('and I log a warning', function () {
       beforeEach(function () {
-        logger('testing', 'warn', 'Some warning')
+        log('testing', 'warn', ['Some warning'])
       })
 
       it('should log a message including a level', function () {
@@ -37,31 +38,31 @@ describe('createConsoleLogger', function () {
 
   describe('when console supports grouping', function () {
     beforeEach(function () {
-      consoleStub = _.reduce(LEVELS, function (console, level) {
+      var stub = _.reduce(LEVELS, function (console, level) {
         console[level] = sinon.stub()
         return console
       }, {})
 
-      _.assign(consoleStub, {
+      _.assign(stub, {
         groupCollapsed: sinon.stub(),
         groupEnd: sinon.stub(),
         log: sinon.stub()
       })
 
-      consoleUtils.set(consoleStub)
-      logger = createConsoleLogger()
+      stubConsole(stub)
     })
 
     describe('when logging with metadata', function () {
       beforeEach(function () {
-        logger('testing', 'warn', 'some warning', {
+        log('testing', 'warn', ['some warning', 'foo', {
           number: 42,
           text: 'some text'
-        })
+        }])
       })
 
       it('starts a collapsed group to contain the metadata', function () {
-        expect(consoleStub.groupCollapsed).was.calledWith(sinon.match(/some warning/))
+        expect(consoleStub.groupCollapsed).was.called()
+        expect(consoleStub.groupCollapsed).was.calledWith(sinon.match(/some warning foo/))
       })
 
       it('name contains level', function () {
@@ -78,16 +79,46 @@ describe('createConsoleLogger', function () {
       })
     })
 
+    describe('when logging with an error', function () {
+      var error
+
+      beforeEach(function () {
+        error = new Error('foo')
+        log('testing', 'warn', ['some warning', 'foo', error])
+      })
+
+      it('should log the message', function () {
+        expect(consoleStub.warn).was.calledWith(sinon.match(/some warning foo/))
+      })
+
+      describe('when console supports levels', function () {
+        it('should log the error', function () {
+          expect(consoleStub.error).was.calledWith(error)
+        })
+      })
+
+      describe('when console doesn\'t support levels', function () {
+        beforeEach(function () {
+          stubConsole({ log: sinon.stub() })
+          log('testing', 'warn', ['some warning', 'foo', error])
+        })
+
+        it('should log the error', function () {
+          expect(consoleStub.log).was.calledWith(error)
+        })
+      })
+    })
+
     describe('when logging with metadata that contains a length property', function () {
       /**
        * if we use _.each with an object that has a `length` property underscore
        * will treat it as a string and invoke us for keys 0..length.
        **/
       beforeEach(function () {
-        logger('testing', 'warn', 'test', {
+        log('testing', 'warn', ['test', {
           hello: 'world',
           length: 10
-        })
+        }])
       })
 
       it('console.log\'s the keys of the object', function () {
@@ -98,7 +129,7 @@ describe('createConsoleLogger', function () {
 
     describe('when logging with no metadata', function () {
       beforeEach(function () {
-        logger('testing', 'warn', 'no metadata here')
+        log('testing', 'warn', ['no metadata', 'here'])
       })
 
       it('calls the specific level', function () {

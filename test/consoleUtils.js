@@ -1,26 +1,25 @@
-var createConsoleLogger = require('../src/createConsoleLogger')
+function noop () {}
 
-function set (newConsole) {
-  createConsoleLogger._setConsole(newConsole)
+function isBrowser () {
+  return typeof window !== 'undefined'
 }
 
-function reset () {
-  createConsoleLogger._resetConsole()
-}
-
-function noop () {
-  set({
-    log: noop,
-    warn: noop,
-    trace: noop,
-    error: noop,
-    debug: noop,
-    info: noop
+function noopAll (log) {
+  var levels = ['log', 'warn', 'trace', 'error', 'debug', 'info']
+  var restore = []
+  levels.forEach(function noopLevel (level) {
+    var original = log[level] || noop
+    log[level] = noop
+    restore.push(function () {
+      log[level] = original
+    })
   })
+  return function restoreAll () {
+    while (restore.length) restore.pop()()
+  }
 }
 
 module.exports = {
-  set: set,
-  reset: reset,
-  noop: noop
+  isBrowser: isBrowser,
+  noop: noopAll
 }

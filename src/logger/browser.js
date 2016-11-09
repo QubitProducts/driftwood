@@ -1,6 +1,8 @@
 var _ = require('slapdash')
-var LEVELS = require('./levels')
-var isBrowser = require('./isBrowser')
+var LEVELS = require('../levels')
+var rightPad = require('../utils/rightPad')
+var argsToComponents = require('../utils/argsToComponents')
+var console = window.console
 
 var levelColors = {
   trace: '#6C7A89',
@@ -8,14 +10,6 @@ var levelColors = {
   info: '#446CB3',
   warn: '#E87E04',
   error: '#F22613'
-}
-var console = getConsole()
-
-function getConsole () {
-  if (isBrowser()) {
-    return window.console
-  }
-  return global.console
 }
 
 /**
@@ -46,9 +40,9 @@ function consoleIsFancy () {
   return console.timeline && console.table && !window.__karma__
 }
 
-function createConsoleLogger () {
+module.exports = function browserLogger () {
   if (!console) {
-    return null
+    return function noop () { }
   }
 
   var allLevels = consoleSupportsAllLevels()
@@ -56,41 +50,49 @@ function createConsoleLogger () {
   var isFancy = consoleIsFancy()
   var color = randomReadableColor()
 
-  return function log (name, level, message, metadata) {
-    if (grouping && hasMetadata()) {
+  return function log (name, level, args) {
+    var components = argsToComponents(args)
+
+    if (grouping && components.metadata) {
       if (isFancy) {
         console.groupCollapsed.apply(console, formatFancyMessage())
       } else {
         console.groupCollapsed(formatMessage())
       }
 
-      _.objectEach(metadata, function (value, key) {
+      _.objectEach(components.metadata, function (value, key) {
         console.log(key, value)
       })
 
       console.groupEnd()
-    } else if (allLevels) {
-      if (isFancy) {
-        console[level].apply(console, formatFancyMessage())
+    } else if (components.message) {
+      if (allLevels) {
+        if (isFancy) {
+          console[level].apply(console, formatFancyMessage())
+        } else {
+          console[level](formatMessage())
+        }
       } else {
-        console[level](formatMessage())
+        // just use console.log
+        console.log(formatMessage())
       }
-    } else {
-      // just use console.log
-      console.log(formatMessage())
     }
 
-    function hasMetadata () {
-      return metadata && _.keys(metadata).length > 0
+    if (components.error) {
+      if (allLevels) {
+        console.error(components.error)
+      } else {
+        console.log(components.error)
+      }
     }
 
     function formatMessage () {
-      return level.toUpperCase() + ' [' + name + ']: ' + message
+      return rightPad(level.toUpperCase(), 5) + ' [' + name + ']: ' + components.message
     }
 
     function formatFancyMessage () {
       return [
-        '%c' + level.toUpperCase() + '%c %c[' + name + ']%c: ' + message,
+        '%c' + rightPad(level.toUpperCase(), 5) + '%c %c[' + name + ']%c: ' + components.message,
         'font-weight:bold;color:' + levelColors[level] + ';',
         '',
         'font-weight:bold;color:' + color + ';',
@@ -100,11 +102,12 @@ function createConsoleLogger () {
   }
 }
 
-module.exports = createConsoleLogger
-
-module.exports._setConsole = function set (newConsole) {
-  console = newConsole
-}
-module.exports._resetConsole = function reset () {
-  console = getConsole()
+// Rewire doesn't work in IE8 and inject-loader doesn't work in node, so we have
+// to expose our own stubbing method
+module.exports.__stubConsole__ = function (stub) {
+  var oldConsole = console
+  console = stub // eslint-disable-line
+  return function reset () {
+    console = oldConsole // eslint-disable-line
+  }
 }
