@@ -26,10 +26,10 @@ Enabling log output:
 
 ```js
 createLogger.enable() // defaults to { '*': 'info' }
-window.__qubit.logger.enable({ // it is also available on the window
+createLogger.enable({
   'foo': 'info',
   'bar:*': 'debug'
-})
+}, { persist: true }) // pass `persist: true` when in the browser to keep logging enabled across pages
 ```
 
 
@@ -64,9 +64,9 @@ var parentLog = createLogger('foo') // namespace will be foo
 var childLog = createLogger('bar') // namespace will be foo:bar
 ```
 
-### `createLogger.enable(config)`
+### `createLogger.enable(config, options)`
 
-Enable logging using the optional log level config. The config is a map of name patterns to log level, defaulting to `{ '*': 'info' }`. See below for more pattern examples. This method is also available on the window at `window.__qubit.logger.enable()`.
+Enable logging using the optional log level config. The config is a map of name patterns to log level, defaulting to `{ '*': 'info' }`. See below for more pattern examples. You can also pass an options object to the enable function. Currently it only supports the `persist` option, which lets keep logging enabled across page views (defaults to false, only supports the browser).
 
 ### `createLogger.disable()`
 
