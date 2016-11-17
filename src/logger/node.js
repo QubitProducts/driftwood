@@ -17,7 +17,7 @@ var levelColors = {
 }
 
 module.exports = function nodeLogger () {
-  return function log (name, level, components) {
+  return function log (name, level, now, components) {
     if (!console) {
       return null
     }
@@ -44,7 +44,7 @@ module.exports = function nodeLogger () {
       }, '')
 
       return [
-        chalk.gray((new Date()).toJSON()),
+        chalk.gray(now.toJSON()),
         chalk.bold[levelColors[level]](rightPad(level.toUpperCase(), 5)),
         chalk.gray('[') + formattedName + chalk.gray(']'),
         chalk.white(components.message)

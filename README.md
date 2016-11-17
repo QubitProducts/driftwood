@@ -40,7 +40,7 @@ createLogger.enable({
 Create a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 3 arguments:
 
 ```js
-function (name, level, { message, error, metadata }) { ... }
+function (name, level, now, { message, error, metadata }) { ... }
 ```
 
 ### `log.{LEVEL}(message, [message], [metadata/Error])`
