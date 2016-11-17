@@ -2,7 +2,6 @@ var Chalk = require('chalk').constructor
 var _ = require('slapdash')
 var util = require('util')
 var rightPad = require('../utils/rightPad')
-var argsToComponents = require('../utils/argsToComponents')
 var console = global.console
 
 var chalk = new Chalk({
@@ -18,9 +17,7 @@ var levelColors = {
 }
 
 module.exports = function nodeLogger () {
-  return function log (name, level, args) {
-    var components = argsToComponents(args)
-
+  return function log (name, level, components) {
     if (!console) {
       return null
     }

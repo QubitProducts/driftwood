@@ -4,8 +4,8 @@ var expect = require('../expect')
 var create = require('../../src/create')
 var LEVELS = require('../../src/levels')
 
-module.exports = function suite (log) {
-  describe('createLogger', function () {
+module.exports = function suite (type, log) {
+  describe('createLogger (' + type + ')', function () {
     var createLogger, logger, consoleStub, reset
 
     afterEach(function () {
@@ -103,7 +103,7 @@ module.exports = function suite (log) {
             })
 
             it('should have logged message at that level', function () {
-              expect(additionalLogger).was.calledWith('testing', level, ['message'])
+              expect(additionalLogger).was.calledWith('testing', level, { message: 'message' })
             })
           })
         })

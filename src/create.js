@@ -1,6 +1,7 @@
 var _ = require('slapdash')
 var patterns = require('./patterns')
 var LEVELS = require('./levels')
+var argsToComponents = require('./utils/argsToComponents')
 
 function noop () { }
 
@@ -28,7 +29,7 @@ module.exports = function create (consoleLogger) {
       if (isEnabled && levelIndex >= minLevelIndex) {
         createSubLogger[level] = function subLogger () {
           var args = [].slice.apply(arguments)
-          logger(name, level, args)
+          logger(name, level, argsToComponents(args))
         }
       } else {
         createSubLogger[level] = noop
