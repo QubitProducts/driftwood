@@ -6,6 +6,7 @@ var browserLogger = require('../../src/logger/browser')
 
 describe('browserLogger', function () {
   var consoleStub, log, reset
+  var now = new Date()
 
   afterEach(function () {
     if (reset) {
@@ -27,7 +28,7 @@ describe('browserLogger', function () {
 
     describe('and I log a warning', function () {
       beforeEach(function () {
-        log('testing', 'warn', { message: 'Some warning' })
+        log('testing', 'warn', now, { message: 'Some warning' })
       })
 
       it('should log a message including a level', function () {
@@ -54,7 +55,7 @@ describe('browserLogger', function () {
 
     describe('when logging with metadata', function () {
       beforeEach(function () {
-        log('testing', 'warn', {
+        log('testing', 'warn', now, {
           message: 'some warning foo',
           metadata: {
             number: 42,
@@ -87,7 +88,7 @@ describe('browserLogger', function () {
 
       beforeEach(function () {
         error = new Error('foo')
-        log('testing', 'warn', {
+        log('testing', 'warn', now, {
           message: 'some warning foo',
           error: error
         })
@@ -106,7 +107,7 @@ describe('browserLogger', function () {
       describe('when console doesn\'t support levels', function () {
         beforeEach(function () {
           stubConsole({ log: sinon.stub() })
-          log('testing', 'warn', {
+          log('testing', 'warn', now, {
             message: 'some warning foo',
             error: error
           })
@@ -124,7 +125,7 @@ describe('browserLogger', function () {
        * will treat it as a string and invoke us for keys 0..length.
        **/
       beforeEach(function () {
-        log('testing', 'warn', {
+        log('testing', 'warn', now, {
           message: 'test',
           metadata: {
             hello: 'world',
@@ -141,7 +142,7 @@ describe('browserLogger', function () {
 
     describe('when logging with no metadata', function () {
       beforeEach(function () {
-        log('testing', 'warn', { message: 'no metadata here' })
+        log('testing', 'warn', now, { message: 'no metadata here' })
       })
 
       it('calls the specific level', function () {

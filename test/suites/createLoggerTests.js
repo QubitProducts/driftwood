@@ -103,7 +103,7 @@ module.exports = function suite (type, log) {
             })
 
             it('should have logged message at that level', function () {
-              expect(additionalLogger).was.calledWith('testing', level, { message: 'message' })
+              expect(additionalLogger).was.calledWith('testing', level, sinon.match.date, { message: 'message' })
             })
           })
         })

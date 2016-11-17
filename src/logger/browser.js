@@ -49,7 +49,7 @@ module.exports = function browserLogger () {
   var isFancy = consoleIsFancy()
   var color = randomReadableColor()
 
-  return function log (name, level, components) {
+  return function log (name, level, now, components) {
     if (grouping && components.metadata) {
       if (isFancy) {
         console.groupCollapsed.apply(console, formatFancyMessage())

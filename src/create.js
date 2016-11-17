@@ -29,7 +29,8 @@ module.exports = function create (consoleLogger) {
       if (isEnabled && levelIndex >= minLevelIndex) {
         createSubLogger[level] = function subLogger () {
           var args = [].slice.apply(arguments)
-          logger(name, level, argsToComponents(args))
+          var now = new Date()
+          logger(name, level, now, argsToComponents(args))
         }
       } else {
         createSubLogger[level] = noop
@@ -45,10 +46,10 @@ module.exports = function create (consoleLogger) {
     loggers = loggers.concat(additionalLoggers)
     return createAPI(name, compositeLogger, additionalLoggers)
 
-    function compositeLogger (name, level, args) {
+    function compositeLogger (name, level, now, args) {
       _.each(loggers, function (logger) {
         try {
-          logger(name, level, args)
+          logger(name, level, now, args)
         } catch (e) { }
       })
     }
