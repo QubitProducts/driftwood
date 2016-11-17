@@ -17,9 +17,17 @@ module.exports = function argsToComponents (args) {
     message = 'metadata:'
   }
 
-  return {
-    error: isError && lastArg,
-    metadata: isMetadata && lastArg,
+  // Handle log.debug(new Error())
+  if (isError && !message) {
+    message = lastArg.message
+  }
+
+  var components = {
     message: message
   }
+
+  if (isError && lastArg) components.error = lastArg
+  if (isMetadata && lastArg) components.metadata = lastArg
+
+  return components
 }

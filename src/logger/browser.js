@@ -1,7 +1,6 @@
 var _ = require('slapdash')
 var LEVELS = require('../levels')
 var rightPad = require('../utils/rightPad')
-var argsToComponents = require('../utils/argsToComponents')
 var console = window.console
 
 var levelColors = {
@@ -50,9 +49,7 @@ module.exports = function browserLogger () {
   var isFancy = consoleIsFancy()
   var color = randomReadableColor()
 
-  return function log (name, level, args) {
-    var components = argsToComponents(args)
-
+  return function log (name, level, components) {
     if (grouping && components.metadata) {
       if (isFancy) {
         console.groupCollapsed.apply(console, formatFancyMessage())

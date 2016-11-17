@@ -27,7 +27,7 @@ describe('browserLogger', function () {
 
     describe('and I log a warning', function () {
       beforeEach(function () {
-        log('testing', 'warn', ['Some warning'])
+        log('testing', 'warn', { message: 'Some warning' })
       })
 
       it('should log a message including a level', function () {
@@ -54,10 +54,13 @@ describe('browserLogger', function () {
 
     describe('when logging with metadata', function () {
       beforeEach(function () {
-        log('testing', 'warn', ['some warning', 'foo', {
-          number: 42,
-          text: 'some text'
-        }])
+        log('testing', 'warn', {
+          message: 'some warning foo',
+          metadata: {
+            number: 42,
+            text: 'some text'
+          }
+        })
       })
 
       it('starts a collapsed group to contain the metadata', function () {
@@ -84,7 +87,10 @@ describe('browserLogger', function () {
 
       beforeEach(function () {
         error = new Error('foo')
-        log('testing', 'warn', ['some warning', 'foo', error])
+        log('testing', 'warn', {
+          message: 'some warning foo',
+          error: error
+        })
       })
 
       it('should log the message', function () {
@@ -100,7 +106,10 @@ describe('browserLogger', function () {
       describe('when console doesn\'t support levels', function () {
         beforeEach(function () {
           stubConsole({ log: sinon.stub() })
-          log('testing', 'warn', ['some warning', 'foo', error])
+          log('testing', 'warn', {
+            message: 'some warning foo',
+            error: error
+          })
         })
 
         it('should log the error', function () {
@@ -115,10 +124,13 @@ describe('browserLogger', function () {
        * will treat it as a string and invoke us for keys 0..length.
        **/
       beforeEach(function () {
-        log('testing', 'warn', ['test', {
-          hello: 'world',
-          length: 10
-        }])
+        log('testing', 'warn', {
+          message: 'test',
+          metadata: {
+            hello: 'world',
+            length: 10
+          }
+        })
       })
 
       it('console.log\'s the keys of the object', function () {
@@ -129,7 +141,7 @@ describe('browserLogger', function () {
 
     describe('when logging with no metadata', function () {
       beforeEach(function () {
-        log('testing', 'warn', ['no metadata', 'here'])
+        log('testing', 'warn', { message: 'no metadata here' })
       })
 
       it('calls the specific level', function () {

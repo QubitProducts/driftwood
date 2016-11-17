@@ -37,10 +37,10 @@ createLogger.enable({
 
 #### `createLogger(name, [additionalLoggers])`
 
-Create a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 4 arguments:
+Create a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 3 arguments:
 
 ```js
-function (name, level, message, metadata) { ... }
+function (name, level, { message, error, metadata }) { ... }
 ```
 
 ### `log.{LEVEL}(message, [message], [metadata/Error])`
@@ -70,7 +70,7 @@ Enable logging using the optional log level config. The config is a map of name 
 
 ### `createLogger.disable()`
 
-Clears the log config, disabling logging. Also available at `window.__qubit.logger.disable()`.
+Clears the log config, disabling logging.
 
 
 ### Enabling logging

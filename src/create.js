@@ -1,6 +1,7 @@
 var _ = require('slapdash')
 var patterns = require('./patterns')
 var LEVELS = require('./levels')
+var argsToComponents = require('./utils/argsToComponents')
 
 function noop () { }
 
@@ -16,11 +17,11 @@ module.exports = function create (consoleLogger) {
     patterns.set({}, { persist: true })
   }
 
-  function createAPI (name, logger) {
+  function createAPI (name, logger, additionalLoggers) {
     var isEnabled = patterns.match(name)
     var minLevelIndex = _.indexOf(LEVELS, patterns.getLevel(name))
 
-    function createSubLogger (subName, additionalLoggers) {
+    function createSubLogger (subName) {
       return createLogger(name + ':' + subName, additionalLoggers)
     }
 
@@ -28,7 +29,7 @@ module.exports = function create (consoleLogger) {
       if (isEnabled && levelIndex >= minLevelIndex) {
         createSubLogger[level] = function subLogger () {
           var args = [].slice.apply(arguments)
-          logger(name, level, args)
+          logger(name, level, argsToComponents(args))
         }
       } else {
         createSubLogger[level] = noop
@@ -44,10 +45,10 @@ module.exports = function create (consoleLogger) {
     loggers = loggers.concat(additionalLoggers)
     return createAPI(name, compositeLogger, additionalLoggers)
 
-    function compositeLogger (name, level, message, metadata) {
+    function compositeLogger (name, level, args) {
       _.each(loggers, function (logger) {
         try {
-          logger(name, level, message, metadata)
+          logger(name, level, args)
         } catch (e) { }
       })
     }
