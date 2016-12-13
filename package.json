@@ -2,7 +2,7 @@
   "name": "driftwood",
   "version": "1.3.2",
   "description": "A namespaced stylish logger primarily for the browser",
-  "main": "./node.js",
+  "main": "./main.js",
   "browser": "./browser.js",
   "scripts": {
     "test": "make test"
