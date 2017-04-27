@@ -21,6 +21,7 @@ module.exports = function (config) {
     singleRun: false,
     colors: true,
     port: 9876,
-    logLevel: config.LOG_INFO
+    logLevel: config.LOG_INFO,
+    browserNoActivityTimeout: 60000
   })
 }
