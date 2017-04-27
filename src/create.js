@@ -5,10 +5,17 @@ var createCompositeLogger = require('./utils/createCompositeLogger')
 function noop () {}
 
 module.exports = function createDriftwood (primaryLogger) {
+  var loggers = []
+
+  driftwood.enable = function enableAll (flags, options) {
+    if (flags) patterns.set(flags, options)
+    for (var i = 0; i < loggers.length; i++) loggers[i].enable(flags)
   }
 
+  driftwood.disable = function disableAll () {
     patterns.set({})
     patterns.set({}, { persist: true })
+    for (var i = 0; i < loggers.length; i++) loggers[i].disable()
   }
 
   return driftwood
