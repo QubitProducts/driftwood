@@ -1,63 +1,66 @@
-var _ = require('slapdash')
 var patterns = require('./patterns')
 var LEVELS = require('./levels')
 var argsToComponents = require('./utils/argsToComponents')
+var createCompositeLogger = require('./utils/createCompositeLogger')
+function noop () {}
 
-function noop () { }
-
-module.exports = function create (consoleLogger) {
-  function enable (flags, opts) {
-    patterns.set(flags || { '*': null }, opts)
+module.exports = function createDriftwood (primaryLogger) {
   }
 
-  function disable () {
-    // It is very unlikely you would want to disable one and not the other,
-    // so we disable both memory and localStorage to fit convention.
     patterns.set({})
     patterns.set({}, { persist: true })
   }
 
-  function createAPI (name, logger, additionalLoggers) {
-    var isEnabled = patterns.match(name)
-    var minLevelIndex = _.indexOf(LEVELS, patterns.getLevel(name))
+  return driftwood
 
-    function createSubLogger (subName) {
-      return createLogger(name + ':' + subName, additionalLoggers)
-    }
-
-    _.each(LEVELS, function (level, levelIndex) {
-      if (isEnabled && levelIndex >= minLevelIndex) {
-        createSubLogger[level] = function subLogger () {
-          var args = [].slice.apply(arguments)
-          var now = new Date()
-          logger(name, level, now, argsToComponents(args))
-        }
-      } else {
-        createSubLogger[level] = noop
-      }
-    })
-
-    return createSubLogger
-  }
-
-  function createLogger (name, additionalLoggers) {
+  function driftwood (name, additionalLoggers) {
     if (!name) throw new Error('name required')
-    var loggers = consoleLogger ? [consoleLogger()] : []
-    loggers = loggers.concat(additionalLoggers)
-    return createAPI(name, compositeLogger, additionalLoggers)
+    var state = { enabled: false, children: [], level: patterns.getLevel(name, patterns.get()) }
+    var logger = additionalLoggers
+      ? createCompositeLogger(primaryLogger, additionalLoggers)
+      : primaryLogger
 
-    function compositeLogger (name, level, now, args) {
-      _.each(loggers, function (logger) {
+    var log = function createLogger (logName) {
+      var log = driftwood(name + ':' + logName, additionalLoggers)
+      if (state.enabled) log.enable()
+      state.children.push(log)
+      return log
+    }
+
+    log.enable = function enableLog (flags) {
+      state.enabled = true
+      if (flags) state.level = patterns.getLevel(name, flags)
+      createLogLevelLoggers()
+      for (var i = 0; i < state.children.length; i++) state.children[i].enable(flags)
+    }
+
+    log.disable = function disableLog () {
+      state.enabled = false
+      createLogLevelLoggers()
+      for (var i = 0; i < state.children.length; i++) state.children[i].disable()
+    }
+
+    createLogLevelLoggers()
+
+    loggers.push(log)
+
+    return log
+
+    function createLogLevelLoggers () {
+      for (var i = 0; i < LEVELS.NAMES.length; i++) {
+        var logLevel = LEVELS.NAMES[i]
+        log[logLevel] = state.enabled ? createLogLevelLogger(logLevel) : noop
+      }
+    }
+
+    function createLogLevelLogger (logLevel) {
+      var logLevelIndex = LEVELS.INDEX[logLevel]
+      return function log () {
+        if (!state.enabled || logLevelIndex < LEVELS.INDEX[state.level]) return
         try {
-          logger(name, level, now, args)
+          logger(name, logLevel, new Date(), argsToComponents(arguments))
         } catch (e) { }
-      })
+      }
     }
   }
-
-  createLogger.LEVELS = LEVELS
-  createLogger.enable = enable
-  createLogger.disable = disable
-
-  return createLogger
 }

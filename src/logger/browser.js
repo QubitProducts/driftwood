@@ -23,7 +23,7 @@ function randomReadableColor () {
 }
 
 function consoleSupportsAllLevels () {
-  return !_.find(LEVELS, function (level) {
+  return !_.find(LEVELS.NAMES, function (level) {
     return !console[level]
   })
 }

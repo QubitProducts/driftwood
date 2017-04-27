@@ -1,1 +1,1 @@
-module.exports = require('./src/create')(require('./src/logger/browser'))
+module.exports = require('./src/create')(require('./src/logger/browser')())
