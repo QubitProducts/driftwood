@@ -81,6 +81,54 @@ module.exports = function suite (type, log) {
         })
       })
 
+      describe('global disable', function () {
+        var parentLogger
+        var childLogger
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          parentLogger = createLogger('foo')
+          childLogger = parentLogger('bar')
+          parentLogger.enable()
+          childLogger.enable()
+          createLogger.disable()
+        })
+
+        it('should not log', function () {
+          parentLogger.info('boz')
+          expect(consoleStub.log).was.notCalled()
+          consoleStub.log.reset()
+          childLogger.info('baz')
+          expect(consoleStub.log).was.notCalled()
+        })
+      })
+
+      describe('global enable', function () {
+        var parentLogger
+        var childLogger
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          parentLogger = createLogger('foo')
+          childLogger = parentLogger('bar')
+          parentLogger.disable()
+          childLogger.disable()
+          createLogger.enable()
+        })
+
+        it('should log', function () {
+          parentLogger.info('boz')
+          expect(consoleStub.log).was.calledWith(sinon.match(/\[foo]/))
+          consoleStub.log.reset()
+          childLogger.info('baz')
+          expect(consoleStub.log).was.calledWith(sinon.match(/\[foo:bar]/))
+        })
+      })
+
       describe('when additional loggers are provided', function () {
         var additionalLogger
 
