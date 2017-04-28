@@ -8,44 +8,83 @@ A namespaced stylish logger for the browser and node.
 ### Example
 
 ```js
-var createLogger = require('driftwood')
+var driftwood = require('driftwood')
 
-var log = createLogger('mymodule-main')
+var log = driftwood('a-module')
 
 log.trace('It supports node and the browser!')
 log.debug('You can', { also: 'send some arbitrary metadata!' })
 
-var subModuleLog = log('a-sub-module')
+var subLog = log('a-sub-module')
 
-subModuleLog.info('You can create loggers off loggers')
-subModuleLog.warn('So that your logs remain under the same top namespace')
-subModuleLog.error('Isn\'t this cool?')
+subLog.info('You can create loggers off loggers')
+subLog.warn('So that your logs remain under the same top namespace')
+subLog.error('Isn\'t this cool?')
 ```
 
-Enabling log output:
+Enabling log output globally:
 
 ```js
-createLogger.enable() // defaults to { '*': 'info' }
-createLogger.enable({
+driftwood.enable() // defaults to { '*': 'info' }
+driftwood.enable({
   'foo': 'info',
   'bar:*': 'debug'
 }, { persist: true }) // pass `persist: true` when in the browser to keep logging enabled across pages
 ```
 
+Enabling log output for specific loggers or subloggers:
+
+```js
+var log = driftwood('a-module')
+var subLog = log('a-sub-module')
+log.enable() // enables log and subLog
+
+var log = driftwood('a-module')
+var subLog = log('a-sub-module')
+subLog.enable() // enables just subLog
+
+log.disable() // disables log and sublog
+```
+
 
 ### API
 
-#### `createLogger(name, [additionalLoggers])`
+### `driftwood.enable(config, options)`
 
-Create a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 3 arguments:
+Enables all loggers globally using the optional log level config. The config is a map of name patterns to log level, defaulting to `{ '*': 'info' }`. See below for more pattern examples. You can also pass an options object to the enable function. Currently it only supports the `persist` option, which lets keep logging enabled across page views (defaults to false, only supports the browser).
+
+### `driftwood.disable()`
+
+Disables all loggers globally and clears the global log config.
+
+### `driftwood(name, [additionalLoggers])`
+
+Creates a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 3 arguments:
 
 ```js
 function (name, level, now, { message, error, metadata }) { ... }
 ```
 
+### `log(name)`
+
+Creates a sub logger that inherits the namespace of its parent.
+
+```js
+var log = driftwood('foo') // namespace will be foo
+var subLog = log('bar') // namespace will be foo:bar
+```
+
+### `log.enable(config)`
+
+Enables a specific logger with a config object (see driftwood.enable). This will be applied to the logger and all of it's descendants.
+
+### `log.disable(config)`
+
+Disables a specific logger and all of it's descendants.
+
 ### `log.{LEVEL}(message, [message], [metadata/Error])`
 
-Log a message at a level, optionally with a metadata object or error instance. Available levels:
+Logs a message at a level, optionally with a metadata object or error instance. Available levels:
 
 - `trace`
 - `debug`
@@ -53,24 +92,7 @@ Log a message at a level, optionally with a metadata object or error instance. A
 - `warn`
 - `error`
 
-The last argument of the log call can be an object or an instance of `Error`, which Driftwood will attempt to present in a more readable fashion. All preceding arguments will be concatenated together into a string. 
-
-### `log(name)`
-
-Create a sub logger. This new logger will inherit the namespace of its parent.
-
-```js
-var parentLog = createLogger('foo') // namespace will be foo
-var childLog = createLogger('bar') // namespace will be foo:bar
-```
-
-### `createLogger.enable(config, options)`
-
-Enable logging using the optional log level config. The config is a map of name patterns to log level, defaulting to `{ '*': 'info' }`. See below for more pattern examples. You can also pass an options object to the enable function. Currently it only supports the `persist` option, which lets keep logging enabled across page views (defaults to false, only supports the browser).
-
-### `createLogger.disable()`
-
-Clears the log config, disabling logging.
+The last argument of the log call can be an object or an instance of `Error`, which Driftwood will attempt to present in a more readable fashion. All preceding arguments will be concatenated together into a string.
 
 
 ### Enabling logging
@@ -85,11 +107,8 @@ By default the logger will not output anything. You need to enable it first, as 
 When running in the browser, you can pass a `persist` flag to persist the log configuration into `localStorage`:
 
 ```js
-createLogger.enable({ '*': 'info' }, { persist: true })
+driftwood.enable({ '*': 'info' }, { persist: true })
 ```
-
-When running in node, it is kept in memory. Therefore if you want log output in node you need to enable it _before_ creating your log instance.
-
 
 ### Best practices
 
@@ -97,8 +116,8 @@ Create a main `logger.js` file in your module/app:
 
 ```js
 // logger.js
-var createLogger = require('driftwood')
-module.exports = createLogger('my-app')
+var driftwood = require('driftwood')
+module.exports = driftwood('my-app')
 ```
 
 In the main part of your app, use the main logger:
@@ -116,14 +135,6 @@ In each of your submodules, create a sub logger:
 var log = require('./logger')('sub-module-a')
 log.debug('We are in a submodule of the app!')
 ```
-
-When running in node and you want log out, enable logging _before_ creating your loggers:
-
-```js
-createLogger.enable()
-var log = createLogger('my-app')
-```
-
 
 ### Want to work on this for your day job?
 
