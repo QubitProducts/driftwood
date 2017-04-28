@@ -2,7 +2,7 @@ var _ = require('slapdash')
 var patterns = require('./patterns')
 var LEVELS = require('./levels')
 var argsToComponents = require('./utils/argsToComponents')
-var createCompositeLogger = require('./utils/createCompositeLogger')
+var compose = require('./utils/compose')
 function noop () {}
 
 module.exports = function createDriftwood (primaryLogger) {
@@ -31,7 +31,7 @@ module.exports = function createDriftwood (primaryLogger) {
     if (!name) throw new Error('name required')
     var state = { enabled: globalState.enabled, children: [], level: patterns.getLevel(name, patterns.get()) }
     var logger = additionalLoggers
-      ? createCompositeLogger(primaryLogger, additionalLoggers)
+      ? compose(primaryLogger, additionalLoggers)
       : primaryLogger
 
     var log = function createLogger (logName) {
@@ -45,13 +45,13 @@ module.exports = function createDriftwood (primaryLogger) {
     log.enable = function enableLog (flags) {
       state.enabled = true
       if (flags) state.level = patterns.getLevel(name, flags)
-      createLogLevelLoggers()
+      createAPI()
       _.invoke(state.children, 'enable', flags)
     }
 
     log.disable = function disableLog () {
       state.enabled = false
-      createLogLevelLoggers()
+      createAPI()
       _.invoke(state.children, 'disable')
     }
 
@@ -64,24 +64,20 @@ module.exports = function createDriftwood (primaryLogger) {
       while (state.children.length) state.children.pop().destroy()
     }
 
-    createLogLevelLoggers()
+    createAPI()
     globalState.loggers.push(log)
     return log
 
-    function createLogLevelLoggers () {
-      _.each(LEVELS.NAMES, function (logLevel) {
-        log[logLevel] = state.enabled ? createLogLevelLogger(logLevel) : noop
+    function createAPI () {
+      _.each(LEVELS.NAMES, function addLevelLogger (logLevel) {
+        var index = LEVELS.INDEX[logLevel]
+        log[logLevel] = function levelLogger () {
+          if (!state.enabled || index < LEVELS.INDEX[state.level]) return
+          try {
+            logger(name, logLevel, new Date(), argsToComponents(arguments))
+          } catch (e) { }
+        }
       })
-    }
-
-    function createLogLevelLogger (logLevel) {
-      var logLevelIndex = LEVELS.INDEX[logLevel]
-      return function log () {
-        if (!state.enabled || logLevelIndex < LEVELS.INDEX[state.level]) return
-        try {
-          logger(name, logLevel, new Date(), argsToComponents(arguments))
-        } catch (e) { }
-      }
     }
   }
 }
