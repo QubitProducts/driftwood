@@ -1,8 +1,7 @@
 var _ = require('slapdash')
 var JSON = require('json-bourne')
 var storage = require('./storage')
-
-var DEFAULT_LEVEL = 'info'
+var LEVELS = require('./levels')
 
 function get () {
   try {
@@ -20,22 +19,18 @@ function set (patterns, opts) {
   } catch (e) { }
 }
 
-function match (name) {
-  var patterns = _.keys(get())
-
+function match (name, flags) {
+  var patterns = _.keys(flags)
   return !!_.find(patterns, function (pattern) {
     return test(pattern, name)
   })
 }
 
-function getLevel (name) {
-  var patterns = get()
-
-  var pattern = _.find(_.keys(patterns), function (pattern) {
-    return test(pattern, name)
-  })
-
-  return patterns[pattern] || DEFAULT_LEVEL
+function getLevel (name, flags) {
+  for (var pattern in flags) {
+    if (test(pattern, name)) return flags[pattern] || LEVELS.DEFAULT
+  }
+  return LEVELS.DEFAULT
 }
 
 function test (pattern, name) {

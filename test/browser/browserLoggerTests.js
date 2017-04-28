@@ -39,7 +39,7 @@ describe('browserLogger', function () {
 
   describe('when console supports grouping', function () {
     beforeEach(function () {
-      var stub = _.reduce(LEVELS, function (console, level) {
+      var stub = _.reduce(LEVELS.NAMES, function (console, level) {
         console[level] = sinon.stub()
         return console
       }, {})

@@ -40,40 +40,31 @@ describe('patterns', function () {
   describe('match', function () {
     describe('when a single wildcard is set', function () {
       it('should match everything', function () {
-        patterns.set({ '*': null })
-        expect(patterns.match('foo')).to.be(true)
-        expect(patterns.match('bar')).to.be(true)
+        expect(patterns.match('foo', { '*': null })).to.be(true)
+        expect(patterns.match('bar', { '*': null })).to.be(true)
       })
     })
 
     describe('when a partial wildcard is set', function () {
-      beforeEach(function () {
-        patterns.set({ 'foo*': null })
-      })
-
       it('should match', function () {
-        expect(patterns.match('foo')).to.be(true)
-        expect(patterns.match('foobar')).to.be(true)
+        expect(patterns.match('foo', { 'foo*': null })).to.be(true)
+        expect(patterns.match('foobar', { 'foo*': null })).to.be(true)
       })
 
       it('should not match if name is not valid', function () {
-        expect(patterns.match('bar')).to.be(false)
-        expect(patterns.match('ofoo')).to.be(false)
+        expect(patterns.match('bar', { 'foo*': null })).to.be(false)
+        expect(patterns.match('ofoo', { 'foo*': null })).to.be(false)
       })
     })
 
     describe('when a non-wildcard pattern is set', function () {
-      beforeEach(function () {
-        patterns.set({ 'foo': null })
-      })
-
       it('should match if name is the exact pattern', function () {
-        expect(patterns.match('foo')).to.be(true)
+        expect(patterns.match('foo', { 'foo': null })).to.be(true)
       })
 
       it('should not match if the name is not the exact pattern', function () {
-        expect(patterns.match('bar')).to.be(false)
-        expect(patterns.match('foos')).to.be(false)
+        expect(patterns.match('bar', { 'foo': null })).to.be(false)
+        expect(patterns.match('foos', { 'foo': null })).to.be(false)
       })
     })
   })
@@ -81,26 +72,23 @@ describe('patterns', function () {
   describe('getLevel', function () {
     describe('when there is no level set', function () {
       it('should return the default level', function () {
-        patterns.set({ '*': null })
-        expect(patterns.getLevel('foo')).to.equal('info')
+        expect(patterns.getLevel('foo', { '*': null })).to.equal('info')
       })
     })
 
     describe('when a level is set', function () {
       it('should return that level', function () {
-        patterns.set({ 'foo': 'trace' })
-        expect(patterns.getLevel('foo')).to.equal('trace')
+        expect(patterns.getLevel('foo', { 'foo': 'trace' })).to.equal('trace')
       })
     })
 
     describe('when multiple matching patterns are set', function () {
       it('should return the first matching level', function () {
-        patterns.set({
+        expect(patterns.getLevel('foob', {
           'bar': 'trace',
           'foo*': 'warn',
           'foob': 'debug'
-        })
-        expect(patterns.getLevel('foob')).to.equal('warn')
+        })).to.equal('warn')
       })
     })
   })

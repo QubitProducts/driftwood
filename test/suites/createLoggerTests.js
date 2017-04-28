@@ -22,7 +22,7 @@ module.exports = function suite (type, log) {
     describe('with no name', function () {
       it('throws exception', function () {
         expect(function () {
-          create(log)()
+          create(log())()
         }).to.throwException()
       })
     })
@@ -33,9 +33,9 @@ module.exports = function suite (type, log) {
           log: sinon.stub()
         }
         stubConsole(consoleStub)
-        createLogger = create(log)
-        createLogger.disable()
+        createLogger = create(log())
         logger = createLogger('testing')
+        logger.disable()
       })
 
       it('should not call console.log', function () {
@@ -45,18 +45,13 @@ module.exports = function suite (type, log) {
     })
 
     describe('when logging is enabled', function () {
-      beforeEach(function () {
-        createLogger = create(log)
-        createLogger.enable()
-      })
-
       describe('if console does not exist', function () {
         it('should not attempt to console log', function () {
           stubConsole(null)
-          createLogger = create(log)
-
+          createLogger = create(log())
+          logger = createLogger('testing')
+          logger.enable()
           expect(function () {
-            logger = createLogger('testing')
             logger.info('foo')
           }).to.not.throwError()
         })
@@ -71,9 +66,10 @@ module.exports = function suite (type, log) {
             log: sinon.stub()
           }
           stubConsole(consoleStub)
-          createLogger = create(log)
+          createLogger = create(log())
           parentLogger = createLogger('foo')
           childLogger = parentLogger('bar')
+          parentLogger.enable()
         })
 
         it('should create a child logger', function () {
@@ -85,18 +81,91 @@ module.exports = function suite (type, log) {
         })
       })
 
+      describe('global disable', function () {
+        var logger1
+        var logger2
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          logger1.enable()
+          logger2.enable()
+          createLogger.disable()
+        })
+
+        it('should not log', function () {
+          logger1.info('boz')
+          expect(consoleStub.log).was.notCalled()
+          consoleStub.log.reset()
+          logger2.info('baz')
+          expect(consoleStub.log).was.notCalled()
+        })
+      })
+
+      describe('global enable', function () {
+        var logger1
+        var logger2
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          logger1.disable()
+          logger2.disable()
+          createLogger.enable()
+        })
+
+        it('should log', function () {
+          logger1.info('boz')
+          expect(consoleStub.log).was.calledWith(sinon.match(/\[foo]/))
+          consoleStub.log.reset()
+          logger2.info('baz')
+          expect(consoleStub.log).was.calledWith(sinon.match(/\[bar]/))
+        })
+      })
+
+      describe('global destroy', function () {
+        var logger1
+        var logger2
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          createLogger.destroy()
+          createLogger.enable()
+          logger1.enable()
+          logger2.enable()
+        })
+
+        it('should not log', function () {
+          logger1.info('boz')
+          expect(consoleStub.log).was.notCalled()
+          consoleStub.log.reset()
+          logger2.info('baz')
+          expect(consoleStub.log).was.notCalled()
+        })
+      })
+
       describe('when additional loggers are provided', function () {
         var additionalLogger
 
         beforeEach(function () {
           stubConsole(consoleStub)
-          createLogger = create(log)
+          createLogger = create(log())
           additionalLogger = sinon.stub()
-          createLogger.enable({ '*': 'trace' })
           logger = createLogger('testing', [additionalLogger])
+          logger.enable({ '*': 'trace' })
         })
 
-        _.each(LEVELS, function (level) {
+        _.each(LEVELS.NAMES, function (level) {
           describe('and logging "' + level + '" message', function () {
             beforeEach(function () {
               logger[level]('message')
