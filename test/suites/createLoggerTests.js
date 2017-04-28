@@ -82,50 +82,75 @@ module.exports = function suite (type, log) {
       })
 
       describe('global disable', function () {
-        var parentLogger
-        var childLogger
+        var logger1
+        var logger2
 
         beforeEach(function () {
           consoleStub = { log: sinon.stub() }
           stubConsole(consoleStub)
           createLogger = create(log())
-          parentLogger = createLogger('foo')
-          childLogger = parentLogger('bar')
-          parentLogger.enable()
-          childLogger.enable()
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          logger1.enable()
+          logger2.enable()
           createLogger.disable()
         })
 
         it('should not log', function () {
-          parentLogger.info('boz')
+          logger1.info('boz')
           expect(consoleStub.log).was.notCalled()
           consoleStub.log.reset()
-          childLogger.info('baz')
+          logger2.info('baz')
           expect(consoleStub.log).was.notCalled()
         })
       })
 
       describe('global enable', function () {
-        var parentLogger
-        var childLogger
+        var logger1
+        var logger2
 
         beforeEach(function () {
           consoleStub = { log: sinon.stub() }
           stubConsole(consoleStub)
           createLogger = create(log())
-          parentLogger = createLogger('foo')
-          childLogger = parentLogger('bar')
-          parentLogger.disable()
-          childLogger.disable()
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          logger1.disable()
+          logger2.disable()
           createLogger.enable()
         })
 
         it('should log', function () {
-          parentLogger.info('boz')
+          logger1.info('boz')
           expect(consoleStub.log).was.calledWith(sinon.match(/\[foo]/))
           consoleStub.log.reset()
-          childLogger.info('baz')
-          expect(consoleStub.log).was.calledWith(sinon.match(/\[foo:bar]/))
+          logger2.info('baz')
+          expect(consoleStub.log).was.calledWith(sinon.match(/\[bar]/))
+        })
+      })
+
+      describe('global destroy', function () {
+        var logger1
+        var logger2
+
+        beforeEach(function () {
+          consoleStub = { log: sinon.stub() }
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          logger1 = createLogger('foo')
+          logger2 = createLogger('bar')
+          createLogger.destroy()
+          createLogger.enable()
+          logger1.enable()
+          logger2.enable()
+        })
+
+        it('should not log', function () {
+          logger1.info('boz')
+          expect(consoleStub.log).was.notCalled()
+          consoleStub.log.reset()
+          logger2.info('baz')
+          expect(consoleStub.log).was.notCalled()
         })
       })
 

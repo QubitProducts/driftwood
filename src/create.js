@@ -1,3 +1,4 @@
+var _ = require('slapdash')
 var patterns = require('./patterns')
 var LEVELS = require('./levels')
 var argsToComponents = require('./utils/argsToComponents')
@@ -55,7 +56,7 @@ module.exports = function createDriftwood (primaryLogger) {
     log.destroy = function destroyLog () {
       log.enable = noop
       log.disable()
-      loggers = loggers.filter(function (logger) {
+      loggers = _.filter(loggers, function (logger) {
         return logger !== log
       })
       while (state.children.length) state.children.pop().destroy()
