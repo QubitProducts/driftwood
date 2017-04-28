@@ -18,6 +18,10 @@ module.exports = function createDriftwood (primaryLogger) {
     for (var i = 0; i < loggers.length; i++) loggers[i].disable()
   }
 
+  driftwood.destroy = function disableAll () {
+    while (loggers.length) loggers.pop().destroy()
+  }
+
   return driftwood
 
   function driftwood (name, additionalLoggers) {
@@ -28,10 +32,11 @@ module.exports = function createDriftwood (primaryLogger) {
       : primaryLogger
 
     var log = function createLogger (logName) {
-      var log = driftwood(name + ':' + logName, additionalLoggers)
-      if (state.enabled) log.enable()
-      state.children.push(log)
-      return log
+      if (log.enable === noop) throw new Error(name + ' was destroyed')
+      var childLog = driftwood(name + ':' + logName, additionalLoggers)
+      if (state.enabled) childLog.enable()
+      state.children.push(childLog)
+      return childLog
     }
 
     log.enable = function enableLog (flags) {
@@ -45,6 +50,15 @@ module.exports = function createDriftwood (primaryLogger) {
       state.enabled = false
       createLogLevelLoggers()
       for (var i = 0; i < state.children.length; i++) state.children[i].disable()
+    }
+
+    log.destroy = function destroyLog () {
+      log.enable = noop
+      log.disable()
+      loggers = loggers.filter(function (logger) {
+        return logger !== log
+      })
+      while (state.children.length) state.children.pop().destroy()
     }
 
     createLogLevelLoggers()
