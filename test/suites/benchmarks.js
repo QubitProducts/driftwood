@@ -21,7 +21,7 @@ suite('logging when disabled', function () {
 }, {
   setup: function () {
     this.logger = createLogger('foo')
-    this.logger.disable()
+    createLogger.disable()
   }
 })
 

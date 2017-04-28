@@ -76,12 +76,15 @@ module.exports = function createDriftwood (primaryLogger) {
     function createAPI () {
       _.each(LEVELS.NAMES, function addLevelLogger (logLevel) {
         var index = LEVELS.INDEX[logLevel]
-        log[logLevel] = function levelLogger () {
-          if (!state.enabled || index < LEVELS.INDEX[state.level]) return
-          try {
-            logger(name, logLevel, new Date(), argsToComponents(arguments))
-          } catch (e) { }
-        }
+        log[logLevel] = state.enabled
+          ? function levelLogger () {
+            if (index >= LEVELS.INDEX[state.level]) {
+              try {
+                logger(name, logLevel, new Date(), argsToComponents(arguments))
+              } catch (e) { }
+            }
+          }
+          : noop
       })
     }
   }
