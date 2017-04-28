@@ -29,7 +29,12 @@ module.exports = function createDriftwood (primaryLogger) {
 
   function driftwood (name, additionalLoggers) {
     if (!name) throw new Error('name required')
-    var state = { enabled: globalState.enabled, children: [], level: patterns.getLevel(name, patterns.get()) }
+    var config = patterns.get()
+    var state = {
+      enabled: globalState.enabled || patterns.match(name, config),
+      level: patterns.getLevel(name, config),
+      children: []
+    }
     var logger = additionalLoggers
       ? compose(primaryLogger, additionalLoggers)
       : primaryLogger
