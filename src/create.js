@@ -10,13 +10,13 @@ module.exports = function createDriftwood (primaryLogger) {
 
   driftwood.enable = function enableAll (flags, options) {
     if (flags) patterns.set(flags, options)
-    for (var i = 0; i < loggers.length; i++) loggers[i].enable(flags)
+    _.invoke(loggers, 'enable', flags)
   }
 
   driftwood.disable = function disableAll () {
     patterns.set({})
     patterns.set({}, { persist: true })
-    for (var i = 0; i < loggers.length; i++) loggers[i].disable()
+    _.invoke(loggers, 'disable')
   }
 
   driftwood.destroy = function disableAll () {
@@ -44,13 +44,13 @@ module.exports = function createDriftwood (primaryLogger) {
       state.enabled = true
       if (flags) state.level = patterns.getLevel(name, flags)
       createLogLevelLoggers()
-      for (var i = 0; i < state.children.length; i++) state.children[i].enable(flags)
+      _.invoke(state.children, 'enable', flags)
     }
 
     log.disable = function disableLog () {
       state.enabled = false
       createLogLevelLoggers()
-      for (var i = 0; i < state.children.length; i++) state.children[i].disable()
+      _.invoke(state.children, 'disable')
     }
 
     log.destroy = function destroyLog () {
@@ -69,10 +69,9 @@ module.exports = function createDriftwood (primaryLogger) {
     return log
 
     function createLogLevelLoggers () {
-      for (var i = 0; i < LEVELS.NAMES.length; i++) {
-        var logLevel = LEVELS.NAMES[i]
+      _.each(LEVELS.NAMES, function (logLevel) {
         log[logLevel] = state.enabled ? createLogLevelLogger(logLevel) : noop
-      }
+      })
     }
 
     function createLogLevelLogger (logLevel) {
