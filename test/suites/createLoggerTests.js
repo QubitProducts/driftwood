@@ -186,6 +186,76 @@ module.exports = function suite (type, log) {
             logger.info('hi test')
           })
         })
+
+        describe('and when logger function is invoked with more additional loggers', function () {
+          var childLogger
+          var extraAdditionalLogger
+          beforeEach(function () {
+            extraAdditionalLogger = sinon.stub()
+            childLogger = logger('again', [extraAdditionalLogger])
+            childLogger.enable({ '*': 'trace' })
+          })
+
+          _.each(LEVELS.NAMES, function (level) {
+            describe('and logging "' + level + '" message', function () {
+              it('should have logged message at that level to the right additional loggers', function () {
+                logger[level]('message')
+                expect(additionalLogger).was.calledWith('testing', level, sinon.match.date, { message: 'message' })
+                expect(extraAdditionalLogger).was.notCalled()
+                additionalLogger.reset()
+                extraAdditionalLogger.reset()
+                childLogger[level]('second message')
+                expect(additionalLogger).was.calledWith('testing:again', level, sinon.match.date, { message: 'second message' })
+                expect(extraAdditionalLogger).was.calledWith('testing:again', level, sinon.match.date, { message: 'second message' })
+              })
+            })
+          })
+        })
+      })
+
+      describe('when interceptors are provided', function () {
+        function prependImportant (args) {
+          return ['important'].concat(args)
+        }
+
+        beforeEach(function () {
+          stubConsole(consoleStub)
+          createLogger = create(log())
+          logger = createLogger('testing', null, [prependImportant])
+          logger.enable({ '*': 'trace' })
+        })
+
+        _.each(LEVELS.NAMES, function (level) {
+          describe('and logging "' + level + '" message', function () {
+            beforeEach(function () {
+              consoleStub.log.reset()
+            })
+
+            it('should have logged message at that level', function () {
+              logger[level]('message')
+              expect(consoleStub.log).was.calledWith(sinon.match(/important message$/))
+            })
+          })
+        })
+
+        describe('and when logger function is invoked with additional interceptors', function () {
+          function upperCased (args) {
+            return args.map(function (str) { return str.toUpperCase() })
+          }
+
+          var childLogger
+          beforeEach(function () {
+            childLogger = logger('bar', null, [upperCased])
+          })
+
+          it('should apply the right interceptors to the right loggers', function () {
+            logger.info('message')
+            expect(consoleStub.log).was.calledWith(sinon.match(/important message$/))
+            consoleStub.log.reset()
+            childLogger.info('proclamation')
+            expect(consoleStub.log).was.calledWith(sinon.match(/IMPORTANT PROCLAMATION$/))
+          })
+        })
       })
     })
   })
