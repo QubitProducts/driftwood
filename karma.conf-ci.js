@@ -3,6 +3,8 @@ var webpack = require('./webpack.config.test')
 module.exports = function (config) {
   process.env.NODE_ENV = 'test'
 
+  process.env.BROWSERS = 'sl_ie_8,sl_ie_9' // to save Saucelabs time; TODO: remove after debugging
+
   // choose from: https://saucelabs.com/platforms/
   var customLaunchers = {
     sl_chrome: {

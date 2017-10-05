@@ -240,7 +240,10 @@ module.exports = function suite (type, log) {
 
         describe('and when logger function is invoked with additional interceptors', function () {
           function upperCased (args) {
-            return args.map(function (str) { return str.toUpperCase() })
+            for (var i = 0; i < args.length; ++i) {
+              args[i] = args[i].toUpperCase()
+            }
+            return args
           }
 
           var childLogger
