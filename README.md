@@ -57,21 +57,55 @@ Enables all loggers globally using the optional log level config. The config is 
 
 Disables all loggers globally and clears the global log config.
 
-### `driftwood(name, [additionalLoggers])`
+### `driftwood(name, [additionalLoggers, [interceptors]])`
 
 Creates a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additionalLoggers` should be an array of functions accepting 4 arguments:
 
 ```js
-function (name, level, now, { message, error, metadata }) { ... }
+function (name, level, now, { message, error, metadata }) {
+  // do whatever
+}
 ```
 
-### `log(name)`
+`interceptors` is an array of functions used to change those arguments before they pass into the loggers:
+
+```js
+function (name, level, now, { message, error, metadata }) {
+  return [newName, newLevel, newDate, {
+    message: newMessage,
+    error: newError,
+    metadata: newMetadata
+  }]
+}
+```
+
+For convenience, the return value can be one of:
+
+* `[name, level, now, { message, error, metadata }]`, to transform each of the four arguments,
+* `{ message, error, metadata }`, to transform only the main components of the message,
+* `message`, to transform only the main message, or
+* a falsey value, to transform nothing.
+
+The interceptors are run sequentially from left to right, _before_ any (additional) loggers.
+
+### `log(name, [additionalLoggers, [interceptors]])`
 
 Creates a sub logger that inherits the namespace of its parent.
 
 ```js
 var log = driftwood('foo') // namespace will be foo
 var subLog = log('bar') // namespace will be foo:bar
+```
+
+When using the sub logger, any `additionalLoggers` and/or `interceptors` provided will run _alongside_ the ones provided to the original logger. When using the original logger, the new functions are not run. All interceptors run _before_ all additional loggers. Within those groups, the original functions run _before_ the new functions. For example:
+
+```js
+function makeImportant(name, level, now, { message }) { return 'important ' + message }
+function capitalize(name, level, now, { message }) { return message.toUpperCase() }
+var log = driftwood('foo', [], [makeImportant])
+var subLog = log('bar', [], [capitalize])
+log.info('message')         // logs: important message
+subLog.info('proclamation') // logs: IMPORTANT PROCLAMATION
 ```
 
 ### `log.enable(config)`
