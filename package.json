@@ -60,6 +60,6 @@
   "dependencies": {
     "json-bourne": "^1.0.1",
     "chalk": "^1.1.3",
-    "slapdash": "^1.2.0"
+    "slapdash": "^1.3.0"
   }
 }
