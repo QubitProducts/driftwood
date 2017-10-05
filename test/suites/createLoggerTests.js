@@ -248,23 +248,16 @@ module.exports = function suite (type, log) {
 
           var childLogger
           beforeEach(function () {
-            console.log('=============================================================================================')
             childLogger = logger('bar', null, [upperCased])
-            console.log('----- 1 -------------------------------------------------------------------------------------')
           })
 
           it('should apply only top level interceptors to top level logs', function () {
             logger.info('message')
             expect(consoleStub.log).was.calledWith(sinon.match(/important message$/))
-            consoleStub.log.reset()
-            console.log('----- A2 -------------------------------------------------------------------------------------')
           })
 
           it('should apply top and lower level interceptors to lower level logs', function () {
             childLogger.info('proclamation')
-            console.log('----- B2 -------------------------------------------------------------------------------------')
-            console.log(consoleStub.log.args)
-            console.log('----- B3 -------------------------------------------------------------------------------------')
             expect(consoleStub.log).was.calledWith(sinon.match(/IMPORTANT PROCLAMATION$/))
           })
         })

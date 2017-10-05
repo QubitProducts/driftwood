@@ -41,16 +41,6 @@ module.exports = function createDriftwood (primaryLogger) {
 
     var log = function createLogger (logName, extraAdditionalLoggers, extraInterceptors) {
       if (log.enable === noop) throw new Error(name + ' was destroyed')
-
-      if (interceptors) { // TODO: remove
-        console.log('[a]', interceptors)
-        console.log('[b]', extraInterceptors)
-        console.log('[c]', interceptors || [])
-        console.log('[d]', extraInterceptors || [])
-        console.log('[e]', (interceptors || []).concat(extraInterceptors || []))
-        console.log('[f]', [0].concat([1, 2, 3]))
-      }
-
       var childLog = driftwood(
         name + ':' + logName,
         (additionalLoggers || []).concat(extraAdditionalLoggers || []),
@@ -89,12 +79,9 @@ module.exports = function createDriftwood (primaryLogger) {
 
     function intercept (args) {
       if (interceptors && interceptors.length > 0) {
-        console.log('--', interceptors)
         for (var i = 0; i < interceptors.length; i++) {
-          console.log('--', i, args)
           args = interceptors[i](args.slice()) || args
         }
-        console.log('--', i, args)
       }
       return args
     }
