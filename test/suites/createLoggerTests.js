@@ -214,17 +214,16 @@ module.exports = function suite (type, log) {
       })
 
       describe('when interceptors are provided', function () {
+        var toThrow
         function prependImportant (name, level, date, components) {
+          if (toThrow) throw toThrow
           return { message: 'important ' + components.message }
         }
 
-        var interceptorStub
         beforeEach(function () {
           stubConsole(consoleStub)
           createLogger = create(log())
-          interceptorStub = sinon.stub()
-          interceptorStub.callsFake(prependImportant)
-          logger = createLogger('testing', null, [interceptorStub])
+          logger = createLogger('testing', null, [prependImportant])
           logger.enable({ '*': 'trace' })
         })
 
@@ -242,12 +241,13 @@ module.exports = function suite (type, log) {
         })
 
         describe('but interceptor throws an error', function () {
-          beforeEach(function () {
-            interceptorStub.throws(new Error('BAH - Humbug!'))
-          })
+          beforeEach(function () { toThrow = new Error('BAH - Humbug!') })
+          afterEach(function () { toThrow = null })
 
           it('should throw an exception when logging', function () {
-            expect(function () { logger.info('hi test') }).to.throwError(function (err) {
+            expect(function () {
+              logger.info('hi test')
+            }).to.throwError(function (err) {
               expect(err.message).to.equal('BAH - Humbug!')
             })
           })
