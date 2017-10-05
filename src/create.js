@@ -85,6 +85,8 @@ module.exports = function createDriftwood (primaryLogger) {
             args = result
           } else if (_.isObject(result)) {
             args[3] = result
+          } else if (typeof result === 'string') {
+            args[3].message = result
           }
         }
       }
