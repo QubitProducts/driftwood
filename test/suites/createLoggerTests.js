@@ -218,10 +218,13 @@ module.exports = function suite (type, log) {
           return { message: 'important ' + components.message }
         }
 
+        var interceptorStub
         beforeEach(function () {
           stubConsole(consoleStub)
           createLogger = create(log())
-          logger = createLogger('testing', null, [prependImportant])
+          interceptorStub = sinon.stub()
+          interceptorStub.callsFake(prependImportant)
+          logger = createLogger('testing', null, [interceptorStub])
           logger.enable({ '*': 'trace' })
         })
 
@@ -234,6 +237,18 @@ module.exports = function suite (type, log) {
             it('should have logged message at that level', function () {
               logger[level]('message')
               expect(consoleStub.log).was.calledWith(sinon.match(/important message$/))
+            })
+          })
+        })
+
+        describe('but interceptor throws an error', function () {
+          beforeEach(function () {
+            interceptorStub.throws(new Error('BAH - Humbug!'))
+          })
+
+          it('should throw an exception when logging', function () {
+            expect(function () { logger.info('hi test') }).to.throwError(function (err) {
+              expect(err.message).to.equal('BAH - Humbug!')
             })
           })
         })
