@@ -239,14 +239,14 @@ module.exports = function suite (type, log) {
         })
 
         describe('and when logger function is invoked with additional interceptors', function () {
-          function braced (args) {
-            return args.map(function (str) { return '{' + str + '}' })
+          function upperCased (args) {
+            return args.map(function (str) { return str.toUpperCase() })
           }
 
           var childLogger
           beforeEach(function () {
             console.log('=============================================================================================')
-            childLogger = logger('bar', null, [braced])
+            childLogger = logger('bar', null, [upperCased])
             console.log('----- 1 -------------------------------------------------------------------------------------')
           })
 
@@ -257,7 +257,9 @@ module.exports = function suite (type, log) {
             console.log('----- 2 -------------------------------------------------------------------------------------')
             childLogger.info('proclamation')
             console.log('----- 3 -------------------------------------------------------------------------------------')
-            expect(consoleStub.log).was.calledWith(sinon.match(/{important} {proclamation}/))
+            console.log(consoleStub.log.args)
+            console.log('----- 4 -------------------------------------------------------------------------------------')
+            expect(consoleStub.log).was.calledWith(sinon.match(/IMPORTANT PROCLAMATION$/))
           })
         })
       })
