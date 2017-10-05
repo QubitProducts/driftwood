@@ -59,7 +59,7 @@ Disables all loggers globally and clears the global log config.
 
 ### `driftwood(name, [additionalLoggers])`
 
-Creates a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additonalLoggers` should be an array of functions accepting 3 arguments:
+Creates a new named log instance, optionally supplying additional loggers (e.g. sentry or devtools). `additionalLoggers` should be an array of functions accepting 4 arguments:
 
 ```js
 function (name, level, now, { message, error, metadata }) { ... }
