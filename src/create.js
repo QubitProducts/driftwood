@@ -80,8 +80,10 @@ module.exports = function createDriftwood (primaryLogger) {
     function intercept (args) {
       if (interceptors && interceptors.length > 0) {
         for (var i = 0; i < interceptors.length; i++) {
+          console.log('--', i, args)
           args = interceptors[i](args.slice()) || args
         }
+        console.log('--', i, args)
       }
       return args
     }
