@@ -214,8 +214,8 @@ module.exports = function suite (type, log) {
       })
 
       describe('when interceptors are provided', function () {
-        function prependImportant (args) {
-          return ['important'].concat(args)
+        function prependImportant (name, level, date, components) {
+          return { message: 'important ' + components.message }
         }
 
         beforeEach(function () {
@@ -239,11 +239,8 @@ module.exports = function suite (type, log) {
         })
 
         describe('and when logger function is invoked with additional interceptors', function () {
-          function upperCased (args) {
-            for (var i = 0; i < args.length; ++i) {
-              args[i] = args[i].toUpperCase()
-            }
-            return args
+          function upperCased (name, level, date, components) {
+            return { message: components.message.toUpperCase() }
           }
 
           var childLogger

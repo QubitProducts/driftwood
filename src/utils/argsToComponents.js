@@ -4,6 +4,7 @@
   a space.
 */
 module.exports = function argsToComponents (args) {
+  args = [].slice.apply(args)
   var lastArg = args[args.length - 1]
 
   var isError = lastArg instanceof Error

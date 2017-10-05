@@ -80,7 +80,12 @@ module.exports = function createDriftwood (primaryLogger) {
     function intercept (args) {
       if (interceptors && interceptors.length > 0) {
         for (var i = 0; i < interceptors.length; i++) {
-          args = interceptors[i](args.slice()) || args
+          var result = interceptors[i].apply(undefined, args)
+          if (_.isArray(result) && result.length === 4) {
+            args = result
+          } else if (_.isObject(result)) {
+            args[3] = result
+          }
         }
       }
       return args
@@ -92,11 +97,10 @@ module.exports = function createDriftwood (primaryLogger) {
         log[logLevel] = state.enabled
           ? function levelLogger () {
             if (index >= LEVELS.INDEX[state.level]) {
+              var args = [name, logLevel, new Date(), argsToComponents(arguments)]
+              args = intercept(args)
               try {
-                var args = [].slice.apply(arguments)
-                args = intercept(args)
-                var components = argsToComponents(args)
-                logger(name, logLevel, new Date(), components)
+                logger.apply(undefined, args)
               } catch (e) { }
             }
           }
