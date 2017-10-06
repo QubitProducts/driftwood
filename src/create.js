@@ -27,7 +27,7 @@ module.exports = function createDriftwood (primaryLogger) {
 
   return driftwood
 
-  function driftwood (name, additionalLoggers) {
+  function driftwood (name, additionalLoggers, interceptors) {
     if (!name) throw new Error('name required')
     var config = patterns.get()
     var state = {
@@ -35,13 +35,17 @@ module.exports = function createDriftwood (primaryLogger) {
       level: patterns.getLevel(name, config),
       children: []
     }
-    var logger = additionalLoggers
+    var logger = additionalLoggers && additionalLoggers.length > 0
       ? compose(primaryLogger, additionalLoggers)
       : primaryLogger
 
-    var log = function createLogger (logName) {
+    var log = function createLogger (logName, extraAdditionalLoggers, extraInterceptors) {
       if (log.enable === noop) throw new Error(name + ' was destroyed')
-      var childLog = driftwood(name + ':' + logName, additionalLoggers)
+      var childLog = driftwood(
+        name + ':' + logName,
+        (additionalLoggers || []).concat(extraAdditionalLoggers || []),
+        (interceptors || []).concat(extraInterceptors || [])
+      )
       if (state.enabled) childLog.enable()
       state.children.push(childLog)
       return childLog
@@ -73,14 +77,32 @@ module.exports = function createDriftwood (primaryLogger) {
     globalState.loggers.push(log)
     return log
 
+    function intercept (args) {
+      if (interceptors && interceptors.length > 0) {
+        for (var i = 0; i < interceptors.length; i++) {
+          var result = interceptors[i].apply(undefined, args)
+          if (_.isArray(result) && result.length === 4) {
+            args = result
+          } else if (_.isObject(result)) {
+            args[3] = result
+          } else if (typeof result === 'string') {
+            args[3].message = result
+          }
+        }
+      }
+      return args
+    }
+
     function createAPI () {
       _.each(LEVELS.NAMES, function addLevelLogger (logLevel) {
         var index = LEVELS.INDEX[logLevel]
         log[logLevel] = state.enabled
           ? function levelLogger () {
             if (index >= LEVELS.INDEX[state.level]) {
+              var args = [name, logLevel, new Date(), argsToComponents(arguments)]
+              args = intercept(args)
               try {
-                logger(name, logLevel, new Date(), argsToComponents(arguments))
+                logger.apply(undefined, args)
               } catch (e) { }
             }
           }
