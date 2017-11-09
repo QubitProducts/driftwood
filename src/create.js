@@ -25,6 +25,8 @@ module.exports = function createDriftwood (primaryLogger) {
     while (globalState.loggers.length) globalState.loggers.pop().destroy()
   }
 
+  driftwood.LEVELS = LEVELS
+
   return driftwood
 
   function driftwood (name, additionalLoggers, interceptors) {
