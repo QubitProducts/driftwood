@@ -16,6 +16,8 @@ var levelColors = {
   error: 'red'
 }
 
+var LOG_TIMESTAMP = !process.env.DRIFTWOOD_NO_TIMESTAMP
+
 module.exports = function nodeLogger () {
   return function log (name, level, now, components) {
     if (!console) {
@@ -43,12 +45,17 @@ module.exports = function nodeLogger () {
         return memo + chalk.magenta(value)
       }, '')
 
-      return [
-        chalk.gray(now.toJSON()),
+      var parts = [
         chalk.bold[levelColors[level]](rightPad(level.toUpperCase(), 5)),
         chalk.gray('[') + formattedName + chalk.gray(']'),
         chalk.white(components.message)
-      ].join(' ')
+      ]
+
+      if (LOG_TIMESTAMP) {
+        parts.unshift(now.toJSON())
+      }
+
+      return parts.join(' ')
     }
   }
 }
