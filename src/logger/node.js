@@ -33,7 +33,7 @@ module.exports = function nodeLogger () {
     }
 
     if (components.error) {
-      console.error(components.error)
+      console.error(components.error.stack || components.error)
     }
 
     function formatMessage () {
