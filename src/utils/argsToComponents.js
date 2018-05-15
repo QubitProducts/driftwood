@@ -7,10 +7,10 @@ module.exports = function argsToComponents (args) {
   args = [].slice.apply(args)
   var lastArg = args[args.length - 1]
 
-  var isError = lastArg instanceof Error
+  var isError = lastArg instanceof Error || isErrorLike(lastArg)
   var isMetadata = !isError && lastArg && typeof lastArg === 'object'
 
-  var messageParts = (isError || isMetadata) ? args.slice(0, -1) : args
+  var messageParts = isError || isMetadata ? args.slice(0, -1) : args
   var message = messageParts.join(' ')
 
   // Handle log.debug({ foo: 'bar' })
@@ -31,4 +31,9 @@ module.exports = function argsToComponents (args) {
   if (isMetadata && lastArg) components.metadata = lastArg
 
   return components
+}
+
+// In some environments, errors doesn't properly inherit from `Error`
+function isErrorLike (thing) {
+  return thing && !!thing.stack && !!thing.message
 }
