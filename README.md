@@ -144,6 +144,14 @@ When running in the browser, you can pass a `persist` flag to persist the log co
 driftwood.enable({ '*': 'info' }, { persist: true })
 ```
 
+### Disabling timestamps
+
+If you prefer to not have timestamps on your logs, you can turn them off in a nodejs environment by setting the `DRIFTWOOD_NO_TIMESTAMP` environment variable to a truthy value.
+
+```sh
+  $ DRIFTWOOD_NO_TIMESTAMP=1 node ./myApp.js
+```
+
 ### Best practices
 
 Create a main `logger.js` file in your module/app:
