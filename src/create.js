@@ -48,13 +48,14 @@ module.exports = function createDriftwood (primaryLogger) {
         (additionalLoggers || []).concat(extraAdditionalLoggers || []),
         (interceptors || []).concat(extraInterceptors || [])
       )
-      if (state.enabled) childLog.enable()
+      if (state.enabled) childLog.enable(state.flags)
       state.children.push(childLog)
       return childLog
     }
 
     log.enable = function enableLog (flags) {
       state.enabled = true
+      state.flags = flags
       if (flags) state.level = patterns.getLevel(name, flags)
       createAPI()
       _.invoke(state.children, 'enable', flags)
